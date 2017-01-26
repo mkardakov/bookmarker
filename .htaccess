@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+    RewriteRule ^(/book/*\.(pdf|txt))$ index.php [L]
+</IfModule>
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Methods: "GET,POST,OPTIONS,DELETE,PUT,PATCH"
+Header add Access-Control-Allow-Headers: "Content-Type, api_key, Authorization"

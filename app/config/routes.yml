@@ -1,0 +1,109 @@
+book_list:
+  path: /book
+  defaults: { _controller: 'Bookmarker\Resources\Book::listBooks' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+book_get:
+  path: /book/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json
+
+book_post:
+  path: /book
+  defaults: { _controller: 'Bookmarker\Resources\Book::add' }
+  methods: ['POST']
+
+book_put:
+  path: /book/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::replace' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+book_delete:
+  path: /book/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::remove' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+
+book_download:
+  path: /book/{file}.{ext}
+  defaults: { _controller: 'Bookmarker\Resources\Book::download' }
+  methods: ['GET']
+  requirements:
+    file: '\w+'
+    ext: 'pdf|txt'
+
+genre_list:
+  path: /genre
+  defaults: { _controller: 'Bookmarker\Resources\Genre::listGenres' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+genre_get:
+  path: /genre/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Genre::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json
+
+genre_post:
+  path: /genre
+  defaults: { _controller: 'Bookmarker\Resources\Genre::add' }
+  methods: ['POST']
+
+genre_put:
+  path: /genre/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Genre::replace' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+genre_delete:
+  path: /genre/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Genre::remove' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+
+author_list:
+  path: /author
+  defaults: { _controller: 'Bookmarker\Resources\Author::listAuthors' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+author_get:
+  path: /author/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Author::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json
+
+author_post:
+  path: /author
+  defaults: { _controller: 'Bookmarker\Resources\Author::add' }
+  methods: ['POST']
+
+author_put:
+  path: /author/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Author::replace' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+author_delete:
+  path: /author/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Author::remove' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'

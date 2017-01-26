@@ -1,0 +1,25 @@
+web:
+  build: .
+  dockerfile: Dockerfile
+  links: ["db"]
+  ports: 
+   - "82:80"
+  volumes:
+   - .:/var/www/html
+  environment:
+   APACHE_LOG_DIR: "/var/www/html/logs"
+   XDEBUG_CONFIG: "remote_host=192.168.1.210"
+db:
+  image: orchardup/mysql
+  ports:
+   - "3306:3306"
+  volumes:
+   - /var/lib/mysql
+  environment:
+   - character-set-server=utf8
+   - collation-server=utf8_general_ci
+swagger-ui:
+  image: swaggerapi/swagger-ui
+  ports:
+   - "8080:8080"
+

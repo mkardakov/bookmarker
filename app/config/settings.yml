@@ -1,0 +1,25 @@
+production:
+  debug: false
+  database:
+      driver: pdo_mysql
+      host: localhost
+      dbname: bookmarker
+      user: root
+      password: ''
+      charset: utf8
+local:
+  debug: true
+  max_record_number: 5
+  database:
+      driver: pdo_mysql
+      host: 172.17.0.1
+      dbname: bookmarker
+      user: root
+      password: ''
+      charset: utf8
+      proxy_path: app/Db/Proxies
+      entities_path: app/Db/Entities
+      repo_path: app/Db/Repositories
+  file_storage:
+      local:
+        path: storage/user/books
