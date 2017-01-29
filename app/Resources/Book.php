@@ -133,6 +133,7 @@ class Book extends Resource
      */
     public function add(\Silex\Application $app, Request $req)
     {
+        $id = 0;
         if ($req->files->has('book')) {
             $fileBag = $req->files->get('book');
             try {
@@ -149,7 +150,7 @@ class Book extends Resource
 
     /**
      * @SWG\Put(
-     *     path="/book",
+     *     path="/book/{id}",
      *     operationId="replaceBook",
      *     summary="Update an existiting book",
      *     description="",

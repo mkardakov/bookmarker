@@ -16,19 +16,19 @@ book_get:
 book_post:
   path: /book
   defaults: { _controller: 'Bookmarker\Resources\Book::add' }
-  methods: ['POST']
+  methods: ['POST', 'OPTIONS']
 
 book_put:
   path: /book/{id}
   defaults: { _controller: 'Bookmarker\Resources\Book::replace' }
-  methods: ['PUT', 'PATCH']
+  methods: ['PUT', 'PATCH', 'OPTIONS']
   requirements:
     id: '\d+'
 
 book_delete:
   path: /book/{id}
   defaults: { _controller: 'Bookmarker\Resources\Book::remove' }
-  methods: ['DELETE']
+  methods: ['DELETE', 'OPTIONS']
   requirements:
     id: '\d+'
 
@@ -58,19 +58,19 @@ genre_get:
 genre_post:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::add' }
-  methods: ['POST']
+  methods: ['POST', 'OPTIONS']
 
 genre_put:
   path: /genre/{id}
   defaults: { _controller: 'Bookmarker\Resources\Genre::replace' }
-  methods: ['PUT', 'PATCH']
+  methods: ['PUT', 'PATCH', 'OPTIONS']
   requirements:
     id: '\d+'
 
 genre_delete:
   path: /genre/{id}
   defaults: { _controller: 'Bookmarker\Resources\Genre::remove' }
-  methods: ['DELETE']
+  methods: ['DELETE', 'OPTIONS']
   requirements:
     id: '\d+'
 
@@ -92,18 +92,67 @@ author_get:
 author_post:
   path: /author
   defaults: { _controller: 'Bookmarker\Resources\Author::add' }
-  methods: ['POST']
+  methods: ['POST', 'OPTIONS']
 
 author_put:
   path: /author/{id}
   defaults: { _controller: 'Bookmarker\Resources\Author::replace' }
-  methods: ['PUT', 'PATCH']
+  methods: ['PUT', 'PATCH', 'OPTIONS']
   requirements:
     id: '\d+'
 
 author_delete:
   path: /author/{id}
   defaults: { _controller: 'Bookmarker\Resources\Author::remove' }
-  methods: ['DELETE']
+  methods: ['DELETE', 'OPTIONS']
   requirements:
     id: '\d+'
+
+user_list:
+  path: /user
+  defaults: { _controller: 'Bookmarker\Resources\User::listUsers' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+user_get:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json
+
+user_post:
+  path: /user
+  defaults: { _controller: 'Bookmarker\Resources\User::add' }
+  methods: ['POST', 'OPTIONS']
+
+user_put:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::replace' }
+  methods: ['PUT', 'PATCH', 'OPTIONS']
+  requirements:
+    id: '\d+'
+
+user_delete:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::remove' }
+  methods: ['DELETE', 'OPTIONS']
+  requirements:
+    id: '\d+'
+
+role_list:
+  path: /role
+  defaults: { _controller: 'Bookmarker\Resources\Role::listRoles' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+role_get:
+  path: /role/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Role::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json

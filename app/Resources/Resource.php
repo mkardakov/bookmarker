@@ -33,4 +33,18 @@ abstract class Resource
         }
         return $actual;
     }
+
+    /**
+     * @param Request $req
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getBody(Request $req)
+    {
+        $data = json_decode($req->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception(json_last_error_msg());
+        }
+        return $data;
+    }
 }

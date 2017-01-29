@@ -26,6 +26,103 @@
         "application/json"
     ],
     "paths": {
+        "/author/{id}": {
+            "get": {
+                "summary": "Retrieve an author by id",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of author to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "author data",
+                        "schema": {
+                            "$ref": "#/definitions/Author"
+                        }
+                    },
+                    "404": {
+                        "description": "Author not found by id"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Updates an author",
+                "operationId": "replace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the author that needs to be update",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Author object that needs to be updated",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "surname": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid Data received"
+                    },
+                    "404": {
+                        "description": "Author not found by id"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete author by ID",
+                "operationId": "remove",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the author that needs to be deleted",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Genre not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            }
+        },
         "/author": {
             "get": {
                 "summary": "Retrieve all authors",
@@ -50,6 +147,42 @@
                                 "$ref": "#/definitions/Author"
                             }
                         }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates a new author",
+                "operationId": "add",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Author object that needs to be added to the system",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "author is added successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "contentUri": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request"
                     }
                 }
             }
@@ -79,60 +212,6 @@
                     },
                     "404": {
                         "description": "Book not found by id"
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Delete book by ID",
-                "operationId": "remove",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the book that needs to be deleted",
-                        "required": true,
-                        "type": "integer",
-                        "format": "int64",
-                        "minimum": 1
-                    }
-                ],
-                "responses": {
-                    "400": {
-                        "description": "Invalid ID supplied"
-                    },
-                    "404": {
-                        "description": "Book not found"
-                    },
-                    "200": {
-                        "description": "success"
-                    }
-                }
-            }
-        },
-        "/book": {
-            "get": {
-                "summary": "Retrieve all books",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "max_record_number",
-                        "in": "query",
-                        "description": "limitation param",
-                        "required": false,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "books set",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/Book"
-                            }
-                        }
                     }
                 }
             },
@@ -194,6 +273,60 @@
                     },
                     "200": {
                         "description": "success"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete book by ID",
+                "operationId": "remove",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the book that needs to be deleted",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            }
+        },
+        "/book": {
+            "get": {
+                "summary": "Retrieve all books",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "max_record_number",
+                        "in": "query",
+                        "description": "limitation param",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "books set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Book"
+                            }
+                        }
                     }
                 }
             },
@@ -310,7 +443,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "genre is uploaded successfully",
+                        "description": "genre is created successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -384,7 +517,7 @@
                         "description": "Invalid Data received"
                     },
                     "404": {
-                        "description": "Book not found by id"
+                        "description": "Genre not found by id"
                     },
                     "200": {
                         "description": "success"
@@ -414,6 +547,156 @@
                     },
                     "200": {
                         "description": "success"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "summary": "Retrieve a user by id",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of user to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user info",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found by id"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Updates a user",
+                "operationId": "replace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user that needs to be update",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User object that needs to be updated",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid Data received"
+                    },
+                    "404": {
+                        "description": "User not found by id"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete user by ID",
+                "operationId": "remove",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user that needs to be deleted",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "summary": "Retrieve all users",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "max_record_number",
+                        "in": "query",
+                        "description": "limitation param",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Users"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates a new user",
+                "operationId": "add",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User object that needs to be added to the system",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "user was created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "contentUri": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request"
                     }
                 }
             }
@@ -462,6 +745,9 @@
                 },
                 "mime": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/User"
                 }
             },
             "type": "object"
@@ -472,6 +758,40 @@
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Role": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "User": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 }
             },
