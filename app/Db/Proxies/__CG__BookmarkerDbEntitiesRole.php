@@ -179,7 +179,7 @@ class Role extends \Bookmarker\Db\Entities\Role implements \Doctrine\ORM\Proxy\P
     public function getId()
     {
         if ($this->__isInitialized__ === false) {
-            return (int)  parent::getId();
+            return  parent::getId();
         }
 
 

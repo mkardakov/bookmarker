@@ -64,10 +64,10 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'role', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
+            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'roles', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'role', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
+        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'roles', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
     }
 
     /**
@@ -301,23 +301,34 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
     /**
      * {@inheritDoc}
      */
-    public function setRole(\Bookmarker\Db\Entities\Role $role = NULL)
+    public function addRole(\Bookmarker\Db\Entities\Role $role)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRole', [$role]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRole', [$role]);
 
-        return parent::setRole($role);
+        return parent::addRole($role);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRole()
+    public function removeRole(\Bookmarker\Db\Entities\Role $role)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRole', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRole', [$role]);
 
-        return parent::getRole();
+        return parent::removeRole($role);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRoles()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRoles', []);
+
+        return parent::getRoles();
     }
 
     /**

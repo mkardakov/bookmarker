@@ -15,6 +15,31 @@ $app->register(new \DerAlex\Pimple\YamlConfigServiceProvider(ROOT . '/app/config
 
 $app['debug'] = $app['config'][APP_ENV]['debug'];
 
+$app->register(new Silex\Provider\SecurityServiceProvider(), array(
+    // prevent using of session cookies
+    'security.firewalls' => array(
+        // allow to register only
+        'sign_up' => array(
+            'pattern' =>  new \Symfony\Component\HttpFoundation\RequestMatcher('^/user$', null, 'POST'),
+            'stateless' => true,
+            'anonymous' => true
+        ),
+        // other routes secured by auth
+        'api' => array(
+            'pattern' => '.*',
+            'http' => true,
+            'stateless' => true,
+            'anonymous' => false,
+            'users' => function($app) {
+                return new \Bookmarker\Providers\UserProvider($app['orm.em']);
+            },
+        ),
+        'default' => array(
+            'stateless' => true
+        )
+    ),
+));
+
 $app['routes'] = $app->extend('routes', function (RouteCollection $routes, Application $app) {
     $loader = new YamlFileLoader(new FileLocator(ROOT . '/app/config'));
     $collection = $loader->load('routes.yml');
@@ -22,6 +47,11 @@ $app['routes'] = $app->extend('routes', function (RouteCollection $routes, Appli
 
     return $routes;
 });
+
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => ROOT.'/logs/monolog.log',
+));
+
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => $app['config'][APP_ENV]['database']
 ));

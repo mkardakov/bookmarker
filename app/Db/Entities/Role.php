@@ -30,9 +30,9 @@ class Role
      * @var integer
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(type="smallint", options={"unsigned":true})
+     * @ORM\Column(type="string", length=20, options={"fixed": true})
      * @JMS\Expose
-     * @SWG\Property(type="integer")
+     * @SWG\Property(type="string")
      */
     private $id;
 
@@ -46,7 +46,8 @@ class Role
 
     /**
      * @var User[]
-     * @ORM\OneToMany(targetEntity="User", mappedBy="role")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="roles")
+     * @ORM\JoinTable(name="users_roles")
      */
     private $users;
 
@@ -61,7 +62,7 @@ class Role
     /**
      * Get id
      *
-     * @return integer
+     * @return string
      */
     public function getId()
     {

@@ -8,7 +8,9 @@
 
 namespace Bookmarker\Db\Repositories;
 
+use Bookmarker\Db\Entities\RegisteredUserDecorator;
 use Bookmarker\Db\Entities\User;
+use Bookmarker\Registry;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -25,16 +27,20 @@ class UserRepository extends Repository
     public function add(array $params)
     {
         $userEntity = new User();
+        $app = Registry::get('app');
         $em = $this->getEntityManager();
         if (array_key_exists('email', $params)) {
             $userEntity->setEmail($params['email']);
         }
         if (array_key_exists('password', $params)) {
-            $hash = $this->encryptPass($params['password']);
+            $hash = $app['security.encoder_factory']
+                ->getEncoder(new RegisteredUserDecorator($userEntity))
+                ->encodePassword($params['password'], null);
             if (!$hash) {
                 throw new \Exception('Cannot compute a hash based received password');
             }
-            $userEntity->setPassword($params['password']);
+            $userEntity->setPassword($hash);
+            $userEntity->addRole($em->find('doctrine:Role', 'ROLE_USER'));
         }
         $em->persist($userEntity);
         $em->flush();

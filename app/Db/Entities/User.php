@@ -35,14 +35,14 @@ class User
      * @JMS\Expose
      * @SWG\Property(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=100)
      * @SWG\Property(type="string")
      */
-    private $password;
+    protected $password;
 
     /**
      * @var string
@@ -50,7 +50,7 @@ class User
      * @JMS\Expose
      * @SWG\Property(type="string")
      */
-    private $name = '';
+    protected $name = '';
 
     /**
      * @var string
@@ -58,7 +58,7 @@ class User
      * @JMS\Expose
      * @SWG\Property(type="string")
      */
-    private $surname = '';
+    protected $surname = '';
 
     /**
      * @var string
@@ -66,22 +66,21 @@ class User
      * @JMS\Expose
      * @SWG\Property(type="string")
      */
-    private $email;
+    protected $email;
 
     /**
-     * @var Role
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
-     * @ORM\JoinColumn(name="role_id", onDelete="SET NULL")
-     * @JMS\Expose
+     * @var Role[]
+     * @ORM\ManyToMany(targetEntity="Role", mappedBy="users")
      * @SWG\Property(type="string")
+     * @JMS\Expose
      */
-    private $role;
+    protected $roles;
 
     /**
      * @var Books[]
      * @ORM\OneToMany(targetEntity="Book", mappedBy="user")
      */
-    private $books;
+    protected $books;
 
     /**
      * Constructor
@@ -222,27 +221,38 @@ class User
     }
 
     /**
-     * Set role
+     * Add role
      *
      * @param \Bookmarker\Db\Entities\Role $role
      *
      * @return User
      */
-    public function setRole(\Bookmarker\Db\Entities\Role $role = null)
+    public function addRole(\Bookmarker\Db\Entities\Role $role)
     {
-        $this->role = $role;
-
+        $this->roles[] = $role;
+        $role->addUser($this);
         return $this;
     }
 
     /**
-     * Get role
+     * Remove role
      *
-     * @return \Bookmarker\Db\Entities\Role
+     * @param \Bookmarker\Db\Entities\Role $role
      */
-    public function getRole()
+    public function removeRole(\Bookmarker\Db\Entities\Role $role)
     {
-        return $this->role;
+        $this->authors->removeElement($role);
+        $role->removeUser($this);
+    }
+
+    /**
+     * Get roles
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getRoles()
+    {
+        return $this->roles;
     }
 
     /**

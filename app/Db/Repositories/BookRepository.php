@@ -5,6 +5,7 @@ namespace Bookmarker\Db\Repositories;
 use Bookmarker\MetadataProcessor\MetadataFactory;
 use Bookmarker\FileDrivers\LocalDriver;
 use Bookmarker\Db\Entities;
+use Bookmarker\Registry;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -30,10 +31,13 @@ class BookRepository extends Repository
         }
         $fileInfo = $metadata->getFileDriver()->getFileInfo();
         $bookEntity = new Entities\Book();
+        $app = Registry::get('app');
+        $user = $app['security.token_storage']->getToken()->getUser()->getUserEntity();
         $bookEntity->setExt($fileInfo['extension'])
             ->setFilePath($fileInfo['dirname'] . DIRECTORY_SEPARATOR . $fileInfo['basename'])
             ->setTitle($fileInfo['filename'])
-            ->setMime($metadata->getFileDriver()->getMimeType());
+            ->setMime($metadata->getFileDriver()->getMimeType())
+            ->setUser($user);
         $em->persist($bookEntity);
         $em->flush();
         return $bookEntity->getId();
@@ -120,6 +124,8 @@ class BookRepository extends Repository
                 $book->addAuthor($authorEntity);
             }
         }
+        $app = Registry::get('app');
+        $book->setUser($app['security.token_storage']->getToken()->getUser()->getUserEntity());
     }
 
 }
