@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: mkardakov
- * Date: 1/8/17
- * Time: 12:58 PM
+ * Date: 1/29/17
+ * Time: 6:01 PM
  */
 
 namespace Bookmarker\Resources;
@@ -15,16 +15,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Bookmarker\Db\Entities;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-class Author extends Resource
+/**
+ * Class User
+ * @package Bookmarker\Resources
+ */
+class User extends Resource
 {
 
     /**
      * @SWG\Get(
-     *     path="/author/{id}",
-     *     summary="Retrieve an author by id",
+     *     path="/user/{id}",
+     *     summary="Retrieve a user by id",
      *      @SWG\Parameter(
-     *         description="ID of author to fetch",
+     *         description="ID of user to fetch",
      *         format="int64",
      *         in="path",
      *         name="id",
@@ -36,12 +39,12 @@ class Author extends Resource
      *     },
      *     @SWG\Response(
      *         response=200,
-     *         description="author data",
-     *         @SWG\Schema(ref="#/definitions/Author")
+     *         description="user info",
+     *         @SWG\Schema(ref="#/definitions/User")
      *     ),
      *     @SWG\Response(
      *         response=404,
-     *         description="Author not found by id",
+     *         description="User not found by id",
      *     ),
      * )
      * @param Application $app
@@ -50,18 +53,18 @@ class Author extends Resource
      */
     public function get(Application $app, $id)
     {
-        $author = $app['orm.em']->find('doctrine:Author', $id);
-        if (!$author instanceof Entities\Author) {
+        $user = $app['orm.em']->find('doctrine:User', $id);
+        if (!$user instanceof Entities\User) {
             return new ErrorResponse('', 404);
         }
-        $jsonContent = $app['serializer']->serialize($author, RESPONSE_FORMAT);
+        $jsonContent = $app['serializer']->serialize($user, RESPONSE_FORMAT);
         return new Response($jsonContent, 200);
     }
 
     /**
      * @SWG\Get(
-     *     path="/author",
-     *     summary="Retrieve all authors",
+     *     path="/user",
+     *     summary="Retrieve all users",
      *     produces={
      *          "application/json"
      *     },
@@ -74,10 +77,10 @@ class Author extends Resource
      *     ),
      *     @SWG\Response(
      *         response=200,
-     *         description="authors set",
+     *         description="users set",
      *         @SWG\Schema(
      *           type="array",
-     *           @SWG\Items(ref="#/definitions/Author")
+     *           @SWG\Items(ref="#/definitions/Users")
      *         )
      *     ),
      * )
@@ -85,40 +88,29 @@ class Author extends Resource
      * @param Request $req
      * @return Response
      */
-    public function listAuthors(Application $app, Request $req)
+    public function listUsers(Application $app, Request $req)
     {
         $actual = $this->getMaxRowsNumber($req);
-        $authors = $app['orm.em']->getRepository('doctrine:Author')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($authors, RESPONSE_FORMAT), 200);
+        $users = $app['orm.em']->getRepository('doctrine:User')->findBy(array(), array(), $actual);
+        return new Response($app['serializer']->serialize($users, RESPONSE_FORMAT), 200);
     }
 
     /**
      * @SWG\Post(
-     *     path="/author",
+     *     path="/user",
      *     operationId="add",
-     *     summary="Creates a new author",
+     *     summary="Creates a new user",
      *     produces={"application/json"},
      *     @SWG\Parameter(
      *         name="body",
      *         in="body",
-     *         description="Author object that needs to be added to the system",
+     *         description="User object that needs to be added to the system",
      *         required=true,
-     *         @SWG\Schema(
-     *                  @SWG\Property(
-     *                      property="name",
-     *                      type="string"
-     *                  )
-     *         ),
-     *         @SWG\Schema(
-     *                  @SWG\Property(
-     *                      property="surname",
-     *                      type="string"
-     *                  )
-     *         ),
+     *         @SWG\Schema(ref="#/definitions/User"),
      *     ),
      *     @SWG\Response(
      *         response=201,
-     *         description="author is added successfully",
+     *         description="user was created",
      *         @SWG\Schema(
      *           type="object",
      *           additionalProperties={
@@ -133,28 +125,28 @@ class Author extends Resource
      * )
      * @param Application $app
      * @param Request $req
-     * @return CreatedResponse|ErrorResponse
+     * @return Response
      */
     public function add(Application $app, Request $req)
     {
         try {
             $data = $this->getBody($req);
-            $id = $app['orm.em']->getRepository('doctrine:Author')->addAuthor($data);
+            $id = $app['orm.em']->getRepository('doctrine:User')->add($data);
         } catch(\Exception $e) {
             return new ErrorResponse($e->getMessage());
         }
-        return new CreatedResponse("/author/$id");
+        return new CreatedResponse("/user/$id");
     }
 
     /**
      * @SWG\Put(
-     *     path="/author/{id}",
+     *     path="/user/{id}",
      *     operationId="replace",
-     *     summary="Updates an author",
+     *     summary="Updates a user",
      *     @SWG\Parameter(
      *     name="id",
      *     in="path",
-     *     description="ID of the author that needs to be update",
+     *     description="ID of the user that needs to be update",
      *     required=true,
      *     type="integer",
      *     format="int64",
@@ -163,18 +155,9 @@ class Author extends Resource
      *     @SWG\Parameter(
      *         name="body",
      *         in="body",
-     *         description="Author object that needs to be updated",
+     *         description="User object that needs to be updated",
      *         required=true,
-     *         @SWG\Schema(
-     *                  @SWG\Property(
-     *                      property="name",
-     *                      type="string"
-     *                  ),
-     *                  @SWG\Property(
-     *                      property="surname",
-     *                      type="string"
-     *                  )
-     *         ),
+     *         @SWG\Schema(ref="#/definitions/User")
      *     ),
      *     @SWG\Response(
      *         response=400,
@@ -182,47 +165,47 @@ class Author extends Resource
      *     ),
      *     @SWG\Response(
      *         response=404,
-     *         description="Author not found by id",
+     *         description="User not found by id",
      *     ),
      *     @SWG\Response(response=200, description="success")
      * )
      * @param Application $app
      * @param Request $req
-     * @param $id
-     * @return ErrorResponse|Response
+     * @param int $id
+     * @return Response
      */
     public function replace(Application $app, Request $req, $id)
     {
         try {
             $data = $this->getBody($req);
-            $author = $app['orm.em']->find('doctrine:Author', $id);
-            if (!$author instanceof Entities\Author) {
-                throw new NotFoundHttpException('Requested author not found');
+            $user = $app['orm.em']->find('doctrine:User', $id);
+            if (!$user instanceof Entities\User) {
+                throw new NotFoundHttpException('Requested user not found');
             }
-            $app['orm.em']->getRepository('doctrine:Author')->updateAuthor($author, $data);
+            $app['orm.em']->getRepository('doctrine:User')->update($user, $data);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
         } catch(\Exception $e) {
-            return new ErrorResponse('Failed to create new author');
+            return new ErrorResponse('Failed to update a user');
         }
         return new Response('', 200);
     }
 
     /**
-     * @SWG\Delete(path="/author/{id}",
-     *   summary="Delete author by ID",
+     * @SWG\Delete(path="/user/{id}",
+     *   summary="Delete user by ID",
      *   operationId="remove",
      *   @SWG\Parameter(
      *     name="id",
      *     in="path",
-     *     description="ID of the author that needs to be deleted",
+     *     description="ID of the user that needs to be deleted",
      *     required=true,
      *     type="integer",
      *     format="int64",
      *     minimum=1.0
      *   ),
      *   @SWG\Response(response=400, description="Invalid ID supplied"),
-     *   @SWG\Response(response=404, description="Genre not found"),
+     *   @SWG\Response(response=404, description="User not found"),
      *   @SWG\Response(response=200, description="success")
      * )
      * @param Application $app
@@ -232,11 +215,11 @@ class Author extends Resource
     public function remove(Application $app, $id)
     {
         try {
-            $author = $app['orm.em']->find('doctrine:Author', $id);
-            if (!$author instanceof Entities\Author) {
+            $user = $app['orm.em']->find('doctrine:User', $id);
+            if (!$user instanceof Entities\User) {
                 throw new NotFoundHttpException('Requested resource not found');
             }
-            $app['orm.em']->getRepository('doctrine:Author')->deleteAuthor($author);
+            $app['orm.em']->getRepository('doctrine:User')->delete($user);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
         } catch (\Exception $e) {

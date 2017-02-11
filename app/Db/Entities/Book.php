@@ -76,6 +76,7 @@ class Book
      * @var Author[]
      * @ORM\ManyToMany(targetEntity="Author", mappedBy="books")
      * @SWG\Property(type="string")
+     * @JMS\Expose
      */
     private $authors;
 
@@ -84,6 +85,7 @@ class Book
      * @ORM\ManyToOne(targetEntity="Genre", inversedBy="books")
      * @ORM\JoinColumn(name="genre_id", onDelete="SET NULL")
      * @SWG\Property(type="string")
+     * @JMS\Expose
      */
     private $genre;
 
@@ -94,6 +96,17 @@ class Book
      * @SWG\Property()
      */
     private $mime;
+
+    /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="books")
+     * @ORM\JoinColumn(name="user_id", onDelete="CASCADE")
+     * @JMS\Expose
+     * @SWG\Property(
+     *     @SWG\Schema(ref="#/definitions/User")
+     * )
+     */
+    private $user;
 
     /**
      * Constructor
@@ -311,33 +324,6 @@ class Book
         return $this;
     }
 
-
-
-    /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("genre")
-     * @return string
-     */
-    public function getGenreTitle()
-    {
-        return $this->genre instanceof Genre ? $this->genre->getTitle() : '';
-    }
-
-    /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("authors")
-     * @JMS\Type("array<string>")
-     * @return array
-     */
-    public function getAuthorNames()
-    {
-        $authorNames = array();
-        foreach ($this->authors as $author) {
-            $authorNames[] = $author->getName() . " " . $author->getSurname();
-        }
-        return $authorNames;
-    }
-
     /**
      * @JMS\VirtualProperty
      * @JMS\SerializedName("book_link")
@@ -348,5 +334,29 @@ class Book
         $metaName = pathinfo($this->getFilePath(), PATHINFO_BASENAME);
 
         return urlencode("/book/$metaName");
+    }
+
+    /**
+     * Set User
+     *
+     * @param \Bookmarker\Db\Entities\User $user
+     *
+     * @return User
+     */
+    public function setUser(\Bookmarker\Db\Entities\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get genre
+     *
+     * @return \Bookmarker\Db\Entities\User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

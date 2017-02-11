@@ -107,3 +107,52 @@ author_delete:
   methods: ['DELETE']
   requirements:
     id: '\d+'
+
+user_list:
+  path: /user
+  defaults: { _controller: 'Bookmarker\Resources\User::listUsers' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+user_get:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json
+
+user_post:
+  path: /user
+  defaults: { _controller: 'Bookmarker\Resources\User::add' }
+  methods: ['POST']
+
+user_put:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::replace' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+user_delete:
+  path: /user/{id}
+  defaults: { _controller: 'Bookmarker\Resources\User::remove' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+
+role_list:
+  path: /role
+  defaults: { _controller: 'Bookmarker\Resources\Role::listRoles' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+role_get:
+  path: /role/{id}
+  defaults: { _controller: 'Bookmarker\Resources\Role::get' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    _format: json

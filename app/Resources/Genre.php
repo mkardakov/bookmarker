@@ -115,7 +115,7 @@ class Genre extends Resource
      *     ),
      *     @SWG\Response(
      *         response=201,
-     *         description="genre is uploaded successfully",
+     *         description="genre is created successfully",
      *         @SWG\Schema(
      *           type="object",
      *           additionalProperties={
@@ -178,7 +178,7 @@ class Genre extends Resource
      *     ),
      *     @SWG\Response(
      *         response=404,
-     *         description="Book not found by id",
+     *         description="Genre not found by id",
      *     ),
      *     @SWG\Response(response=200, description="success")
      * )

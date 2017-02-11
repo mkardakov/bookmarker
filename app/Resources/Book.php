@@ -133,6 +133,7 @@ class Book extends Resource
      */
     public function add(\Silex\Application $app, Request $req)
     {
+        $id = 0;
         if ($req->files->has('book')) {
             $fileBag = $req->files->get('book');
             try {
@@ -149,7 +150,7 @@ class Book extends Resource
 
     /**
      * @SWG\Put(
-     *     path="/book",
+     *     path="/book/{id}",
      *     operationId="replaceBook",
      *     summary="Update an existiting book",
      *     description="",
@@ -216,10 +217,7 @@ class Book extends Resource
             if (!$book instanceof Entities\Book) {
                 throw new NotFoundHttpException('Requested resource not found');
             }
-            $data = json_decode($req->getContent(), true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(json_last_error_msg());
-            }
+            $data = $this->getBody($req);
             $app['orm.em']->getRepository('doctrine:Book')->updateBook($book, $data);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);

@@ -21,4 +21,9 @@
  *   produces={"application/json"},
  *   consumes={"application/json"}
  * )
+ *
+ * @SWG\SecurityScheme(
+ *   securityDefinition="Basic authorization by login:password",
+ *   type="basic"
+ * )
  */
