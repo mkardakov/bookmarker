@@ -766,7 +766,7 @@
         "Role": {
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -791,11 +791,16 @@
                 "email": {
                     "type": "string"
                 },
-                "role": {
+                "roles": {
                     "type": "string"
                 }
             },
             "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "Basic authorization by login:password": {
+            "type": "basic"
         }
     }
 }

@@ -9,7 +9,6 @@
 namespace Bookmarker\Providers;
 
 
-use Bookmarker\Db\Entities\RegisteredUserDecorator;
 use Bookmarker\Db\Entities\User;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -44,7 +43,7 @@ class UserProvider implements UserProviderInterface
             throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
         }
 
-        return new RegisteredUserDecorator($user);
+        return $user;
     }
 
     /**
@@ -66,6 +65,6 @@ class UserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $class === 'Bookmarker\Db\Entities\RegisteredUserDecorator';
+        return $class === 'Bookmarker\Db\Entities\User';
     }
 }

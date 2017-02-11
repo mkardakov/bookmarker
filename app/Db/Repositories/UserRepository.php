@@ -8,7 +8,6 @@
 
 namespace Bookmarker\Db\Repositories;
 
-use Bookmarker\Db\Entities\RegisteredUserDecorator;
 use Bookmarker\Db\Entities\User;
 use Bookmarker\Registry;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,7 +33,7 @@ class UserRepository extends Repository
         }
         if (array_key_exists('password', $params)) {
             $hash = $app['security.encoder_factory']
-                ->getEncoder(new RegisteredUserDecorator($userEntity))
+                ->getEncoder($userEntity)
                 ->encodePassword($params['password'], null);
             if (!$hash) {
                 throw new \Exception('Cannot compute a hash based received password');

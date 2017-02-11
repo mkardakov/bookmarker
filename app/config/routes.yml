@@ -16,19 +16,19 @@ book_get:
 book_post:
   path: /book
   defaults: { _controller: 'Bookmarker\Resources\Book::add' }
-  methods: ['POST', 'OPTIONS']
+  methods: ['POST']
 
 book_put:
   path: /book/{id}
   defaults: { _controller: 'Bookmarker\Resources\Book::replace' }
-  methods: ['PUT', 'PATCH', 'OPTIONS']
+  methods: ['PUT', 'PATCH']
   requirements:
     id: '\d+'
 
 book_delete:
   path: /book/{id}
   defaults: { _controller: 'Bookmarker\Resources\Book::remove' }
-  methods: ['DELETE', 'OPTIONS']
+  methods: ['DELETE']
   requirements:
     id: '\d+'
 
@@ -58,19 +58,19 @@ genre_get:
 genre_post:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::add' }
-  methods: ['POST', 'OPTIONS']
+  methods: ['POST']
 
 genre_put:
   path: /genre/{id}
   defaults: { _controller: 'Bookmarker\Resources\Genre::replace' }
-  methods: ['PUT', 'PATCH', 'OPTIONS']
+  methods: ['PUT', 'PATCH']
   requirements:
     id: '\d+'
 
 genre_delete:
   path: /genre/{id}
   defaults: { _controller: 'Bookmarker\Resources\Genre::remove' }
-  methods: ['DELETE', 'OPTIONS']
+  methods: ['DELETE']
   requirements:
     id: '\d+'
 
@@ -92,19 +92,19 @@ author_get:
 author_post:
   path: /author
   defaults: { _controller: 'Bookmarker\Resources\Author::add' }
-  methods: ['POST', 'OPTIONS']
+  methods: ['POST']
 
 author_put:
   path: /author/{id}
   defaults: { _controller: 'Bookmarker\Resources\Author::replace' }
-  methods: ['PUT', 'PATCH', 'OPTIONS']
+  methods: ['PUT', 'PATCH']
   requirements:
     id: '\d+'
 
 author_delete:
   path: /author/{id}
   defaults: { _controller: 'Bookmarker\Resources\Author::remove' }
-  methods: ['DELETE', 'OPTIONS']
+  methods: ['DELETE']
   requirements:
     id: '\d+'
 
@@ -126,19 +126,19 @@ user_get:
 user_post:
   path: /user
   defaults: { _controller: 'Bookmarker\Resources\User::add' }
-  methods: ['POST', 'OPTIONS']
+  methods: ['POST']
 
 user_put:
   path: /user/{id}
   defaults: { _controller: 'Bookmarker\Resources\User::replace' }
-  methods: ['PUT', 'PATCH', 'OPTIONS']
+  methods: ['PUT', 'PATCH']
   requirements:
     id: '\d+'
 
 user_delete:
   path: /user/{id}
   defaults: { _controller: 'Bookmarker\Resources\User::remove' }
-  methods: ['DELETE', 'OPTIONS']
+  methods: ['DELETE']
   requirements:
     id: '\d+'
 

@@ -20,7 +20,7 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     'security.firewalls' => array(
         // allow to register only
         'sign_up' => array(
-            'pattern' =>  new \Symfony\Component\HttpFoundation\RequestMatcher('^/user$', null, 'POST'),
+            'pattern' =>  new \Symfony\Component\HttpFoundation\RequestMatcher('^/user$', null, ['POST']),
             'stateless' => true,
             'anonymous' => true
         ),
@@ -80,6 +80,16 @@ $app->register(new DoctrineOrmServiceProvider(), array(
 $app->register(new JDesrosiers\Silex\Provider\JmsSerializerServiceProvider(), array(
     "serializer.srcDir" => ROOT . "/vendor/jms/serializer/src"
 ));
+
+/**
+ * Basic support of OPTIONS method for CORS feature at documentation
+ */
+$app->before(function(\Symfony\Component\HttpFoundation\Request $request) use($app) {
+    if ($request->getMethod() === 'OPTIONS') {
+        header('Allow: GET,POST,OPTIONS,DELETE,PUT,PATCH');
+        exit();
+    }
+}, Application::EARLY_EVENT);
 
 $loader = require ROOT . 'vendor/autoload.php';
 Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(array($loader, "loadClass"));

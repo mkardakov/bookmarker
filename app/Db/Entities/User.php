@@ -11,6 +11,7 @@ namespace Bookmarker\Db\Entities;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class User
@@ -25,7 +26,7 @@ use Swagger\Annotations as SWG;
  * )
  */
 
-class User
+class User implements UserInterface
 {
     /**
      * @var integer
@@ -250,9 +251,22 @@ class User
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getRoles()
+    public function getRolesEntities()
     {
         return $this->roles;
+    }
+
+    /**
+     * Required method for Security Provider
+     * @return array
+     */
+    public function getRoles()
+    {
+        $rolesArr = [];
+        foreach ($this->getRolesEntities() as $role) {
+            $rolesArr[] = $role->getId();
+        }
+        return $rolesArr;
     }
 
     /**
@@ -277,5 +291,38 @@ class User
     public function removeBook(\Bookmarker\Db\Entities\Book $book)
     {
         $this->users->removeElement($book);
+    }
+
+    /**
+     * Returns the salt that was originally used to encode the password.
+     *
+     * This can return null if the password was not encoded using a salt.
+     *
+     * @return string|null The salt
+     */
+    public function getSalt()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the username used to authenticate the user.
+     *
+     * @return string The username
+     */
+    public function getUsername()
+    {
+        $this->getEmail();
+    }
+
+    /**
+     * Removes sensitive data from the user.
+     *
+     * This is important if, at any given point, sensitive information like
+     * the plain-text password is stored on this object.
+     */
+    public function eraseCredentials()
+    {
+
     }
 }

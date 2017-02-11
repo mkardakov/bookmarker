@@ -32,7 +32,7 @@ class BookRepository extends Repository
         $fileInfo = $metadata->getFileDriver()->getFileInfo();
         $bookEntity = new Entities\Book();
         $app = Registry::get('app');
-        $user = $app['security.token_storage']->getToken()->getUser()->getUserEntity();
+        $user = $app['security.token_storage']->getToken()->getUser();
         $bookEntity->setExt($fileInfo['extension'])
             ->setFilePath($fileInfo['dirname'] . DIRECTORY_SEPARATOR . $fileInfo['basename'])
             ->setTitle($fileInfo['filename'])
