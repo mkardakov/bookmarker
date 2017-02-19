@@ -109,11 +109,19 @@ class Book
     private $user;
 
     /**
+     * @var BookCovers[]
+     * @ORM\OneToMany(targetEntity="BookCovers", mappedBy="book")
+     * @SWG\Property()
+     */
+    private $bookCovers;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->authors = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->bookCovers = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -358,5 +366,55 @@ class Book
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Add bookCover
+     *
+     * @param \Bookmarker\Db\Entities\BookCovers $bookCover
+     *
+     * @return Book
+     */
+    public function addBookCover(\Bookmarker\Db\Entities\BookCovers $bookCover)
+    {
+        $this->bookCovers[] = $bookCover;
+
+        return $this;
+    }
+
+    /**
+     * Remove bookCover
+     *
+     * @param \Bookmarker\Db\Entities\BookCovers $bookCover
+     */
+    public function removeBookCover(\Bookmarker\Db\Entities\BookCovers $bookCover)
+    {
+        $this->bookCovers->removeElement($bookCover);
+    }
+
+    /**
+     * Get bookCovers
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getBookCovers()
+    {
+        return $this->bookCovers;
+    }
+
+    /**
+     * @JMS\VirtualProperty
+     * @JMS\SerializedName("cover")
+     * @return string
+     */
+    public function getMainCover()
+    {
+        $main = $this->getBookCovers()->filter(function(BookCovers $cover) {
+            return $cover->getIsMain();
+        });
+
+        if (!$main->isEmpty()) {
+            return $main->first()->getDownloadLink();
+        }
     }
 }

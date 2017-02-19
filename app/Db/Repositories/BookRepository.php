@@ -58,7 +58,7 @@ class BookRepository extends Repository
             $em->persist($bookEntity);
             $em->flush();
             $em->getConnection()->commit();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $em->getConnection()->rollBack();
             throw $e;
         }
@@ -71,9 +71,19 @@ class BookRepository extends Repository
     public function deleteBook(Entities\Book $bookEntity)
     {
         try {
-            $fileName = basename($bookEntity->getFilePath());
-            $fileDriver = new LocalDriver($fileName);
-            $fileDriver->delete();
+            $delCallback = function($fileName) {
+                try {
+                    $fileDriver = new LocalDriver($fileName, true);
+                    $fileDriver->delete();
+                    return true;
+                } catch(\Exception $e) {
+                    return false;
+                }
+            };
+            $delCallback($bookEntity->getFilePath());
+            $bookEntity->getBookCovers()->forAll(function($index, Entities\BookCovers $cover) use ($delCallback) {
+                return $delCallback($cover->getImagePath());
+            });
         } catch(\Exception $e) {
             throw $e;
         } finally {
@@ -126,6 +136,60 @@ class BookRepository extends Repository
         }
         $app = Registry::get('app');
         $book->setUser($app['security.token_storage']->getToken()->getUser()->getUserEntity());
+    }
+
+    /**
+     * @param Entities\Book $book
+     * @param UploadedFile $uploadedFile
+     * @return Entities\BookCovers
+     * @throws \Exception
+     */
+    public function addBookCover(Entities\Book $book, UploadedFile $uploadedFile)
+    {
+        $driver = new LocalDriver($uploadedFile->getRealPath(), true);
+        if (!$driver->store()) {
+            throw new \Exception('Failed to store book cover');
+        }
+        $info = $driver->getFileInfo();
+        $bookCover = new Entities\BookCovers();
+        $bookCover->setBook($book)
+            ->setImagePath($info['dirname'] . '/' . $info['basename']);
+        $this->getEntityManager()->persist($bookCover);
+        $this->getEntityManager()->flush();
+        return $bookCover;
+    }
+
+    /**
+     * @param Entities\BookCovers $cover
+     * @throws \Exception
+     */
+    public function deleteBookCover(Entities\BookCovers $cover)
+    {
+        $em = $this->getEntityManager();
+        try {
+            $fileName = basename($cover->getImagePath());
+            $fileDriver = new LocalDriver($fileName);
+            $fileDriver->delete();
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $em->remove($cover);
+            $em->flush();
+        }
+    }
+
+    /**
+     * @param Entities\BookCovers $bookCover
+     * @param array $params
+     */
+    public function updateBookCover(Entities\BookCovers $bookCover, array $params)
+    {
+        $em = $this->getEntityManager();
+        if (array_key_exists('is_main', $params)) {
+            $bookCover->setIsMain($params['is_main']);
+            $em->persist($bookCover);
+            $em->flush();
+        }
     }
 
 }

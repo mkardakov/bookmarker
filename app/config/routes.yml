@@ -40,6 +40,43 @@ book_download:
     file: '\w+'
     ext: 'pdf|txt'
 
+book_covers_list:
+  path: /book/{id}/covers
+  defaults: { _controller: 'Bookmarker\Resources\Book::listBookCovers' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+book_covers_post:
+  path: /book/{id}/covers
+  defaults: { _controller: 'Bookmarker\Resources\Book::addCover' }
+  methods: ['POST']
+
+book_covers_put:
+  path: /book/{id}/covers/{cover_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::replaceCover' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+    cover_id: '\d+'
+
+book_covers_delete:
+  path: /book/{id}/covers/{cover_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::removeCover' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+    cover_id: '\d+'
+
+book_cover_download:
+  path: /book/{id}/covers/{file}.{ext}
+  defaults: { _controller: 'Bookmarker\Resources\Book::downloadCover' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    file: '\w+'
+    ext: 'png|jpe?g'
+
 genre_list:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::listGenres' }
