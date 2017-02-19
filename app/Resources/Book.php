@@ -307,4 +307,274 @@ class Book extends Resource
             return new ErrorResponse($e->getMessage());
         }
     }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/covers",
+     *     summary="Retrieve all book covers for particular book",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Parameter(
+     *        name="id",
+     *        in="path",
+     *        description="ID of the target book",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="book covers set",
+     *         @SWG\Schema(
+     *           type="array",
+     *           @SWG\Items(ref="#/definitions/BookCover")
+     *         )
+     *     ),
+     *     @SWG\Response(response=404, description="Book not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param int $id
+     * @return Response
+     */
+    public function listBookCovers(\Silex\Application $app, $id)
+    {
+        $book = $app['orm.em']->find('doctrine:Book', $id);
+        if (!$book instanceof Entities\Book) {
+            return new ErrorResponse('', 404);
+        }
+        $bookCovers = $book->getBookCovers();
+        return new Response($app['serializer']->serialize($bookCovers, RESPONSE_FORMAT), 200);
+    }
+
+    /**
+     * @SWG\Post(
+     *     path="/book/{id}/covers",
+     *     operationId="addBookCover",
+     *     summary="Creates a new book cover based on received file",
+     *     produces={"application/json"},
+     *     consumes={"multipart/form-data"},
+     *     @SWG\Parameter(
+     *        name="id",
+     *        in="path",
+     *        description="ID of the target book",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *     @SWG\Parameter(
+     *          description="book to upload",
+     *         in="formData",
+     *         name="cover",
+     *         required=true,
+     *         type="file"
+     *     ),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="book is uploaded successfully",
+     *         @SWG\Schema(
+     *           type="object",
+     *           additionalProperties={
+     *            "contentUri":"string"
+     *           }
+     *         ),
+     *     ),
+     *     @SWG\Response(response=404, description="Book not found"),
+     *     @SWG\Response(
+     *         response="400",
+     *         description="bad request"
+     *     )
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param int $id
+     * @return Response
+     */
+    public function addCover(\Silex\Application $app, Request $req, $id)
+    {
+        $book = $app['orm.em']->find('doctrine:Book', $id);
+        if (!$book instanceof Entities\Book) {
+            return new ErrorResponse('', 404);
+        }
+        if ($req->files->has('cover')) {
+            $fileBag = $req->files->get('cover');
+            try {
+                if (!$fileBag instanceof UploadedFile) {
+                    throw new \Exception('No file received');
+                }
+                $bookCover = $app['orm.em']->getRepository('doctrine:Book')->addBookCover($book, $fileBag);
+                if (!$bookCover instanceof Entities\BookCovers) {
+                    throw new \Exception('Failed to add new book cover');
+                }
+            } catch (\Exception $e) {
+                return new ErrorResponse($e->getMessage());
+            }
+        }
+        return new CreatedResponse(sprintf("/book/%d/covers/%d", $bookCover->getBook()->getId(), $bookCover->getId()));
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/covers/{filename}",
+     *     summary="Show or Download book cover",
+     *     @SWG\Parameter(
+     *        name="id",
+     *        in="path",
+     *        description="ID of the target book",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *      @SWG\Parameter(
+     *         description="name of the book cover to download",
+     *         format="string",
+     *         in="path",
+     *         name="filename",
+     *         required=true,
+     *         type="string"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="book cover file",
+     *         @SWG\Schema(type="file")
+     *     ),
+     *     @SWG\Response(response=400, description="bad request"),
+     *     @SWG\Response(response=404, description="Book cover not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param int $id
+     * @param string $file
+     * @param string $ext
+     * @return ErrorResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function downloadCover(\Silex\Application $app, $id, $file, $ext)
+    {
+        $book = $app['orm.em']->find('doctrine:Book', $id);
+        if (!$book instanceof Entities\Book) {
+            return new ErrorResponse('', 404);
+        }
+        return $this->download($app, $file, $ext);
+    }
+
+    /**
+     * @SWG\Put(
+     *     path="/book/{id}/covers/{cover_id}",
+     *     operationId="replaceBookCover",
+     *     summary="Update an existiting book cover meta-data",
+     *     consumes={"application/json"},
+     *     @SWG\Parameter(
+     *        name="id",
+     *        in="path",
+     *        description="ID of the target book",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *     @SWG\Parameter(
+     *        name="cover_id",
+     *        in="path",
+     *        description="ID of the target book cover",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Book object that needs to be added to the store",
+     *         required=true,
+     *         minimum=1.0,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="is_main",
+     *                      type="boolean"
+     *                  )
+     *         ),
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Invalid Data received",
+     *     ),
+     *     @SWG\Response(
+     *         response=404,
+     *         description="Book or Book cover not found by id",
+     *     ),
+     *     @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param int $id
+     * @param int $cover_id
+     * @return Response
+     */
+    public function replaceCover(\Silex\Application $app, Request $req, $id, $cover_id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            $bookCover = $app['orm.em']->find('doctrine:BookCovers', $cover_id);
+            if (!($book instanceof Entities\Book && $bookCover instanceof Entities\BookCovers)) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $data = $this->getBody($req);
+            $app['orm.em']->getRepository('doctrine:Book')->updateBookCover($bookCover, $data);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Delete(path="/book/{id}/covers/{cover_id}",
+     *   summary="Delete book cover by ID",
+     *   operationId="removeCover",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="ID of the book that needs to be deleted",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *   @SWG\Parameter(
+     *     name="cover_id",
+     *     in="path",
+     *     description="ID of the target book cover",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *   @SWG\Response(response=400, description="Invalid ID supplied"),
+     *   @SWG\Response(response=404, description="Book or Book cover not found"),
+     *   @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param $id
+     * @return ErrorResponse|Response
+     */
+    public function removeCover(\Silex\Application $app, $id, $cover_id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            $bookCover = $app['orm.em']->find('doctrine:BookCovers', $cover_id);
+            if (!($book instanceof Entities\Book && $bookCover instanceof Entities\BookCovers)) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $app['orm.em']->getRepository('doctrine:Book')->deleteBookCover($bookCover);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 200);
+    }
+
 }

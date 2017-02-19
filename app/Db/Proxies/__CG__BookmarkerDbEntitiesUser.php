@@ -64,10 +64,10 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'roles', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
+            return ['__isInitialized__', 'id', 'password', 'name', 'surname', 'email', 'roles', 'books'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'password', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'name', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'surname', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'email', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'roles', '' . "\0" . 'Bookmarker\\Db\\Entities\\User' . "\0" . 'books'];
+        return ['__isInitialized__', 'id', 'password', 'name', 'surname', 'email', 'roles', 'books'];
     }
 
     /**
@@ -323,6 +323,17 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
     /**
      * {@inheritDoc}
      */
+    public function getRolesEntities()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRolesEntities', []);
+
+        return parent::getRolesEntities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getRoles()
     {
 
@@ -351,6 +362,39 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeBook', [$book]);
 
         return parent::removeBook($book);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSalt()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSalt', []);
+
+        return parent::getSalt();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUsername()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsername', []);
+
+        return parent::getUsername();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function eraseCredentials()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'eraseCredentials', []);
+
+        return parent::eraseCredentials();
     }
 
 }
