@@ -135,7 +135,7 @@ class BookRepository extends Repository
             }
         }
         $app = Registry::get('app');
-        $book->setUser($app['security.token_storage']->getToken()->getUser()->getUserEntity());
+        $book->setUser($app['security.token_storage']->getToken()->getUser());
     }
 
     /**
