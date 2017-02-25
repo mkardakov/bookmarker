@@ -9,6 +9,7 @@
 namespace Bookmarker\MetadataProcessor;
 
 use Bookmarker\FileDrivers\IDriver;
+use Bookmarker\MetadataProcessor\DataSet\IData;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -18,9 +19,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class Metadata
 {
     /**
-     * @var
+     * @var IData
      */
-    protected $metadata;
+    protected $info;
 
     /**
      * @var UploadedFile
@@ -42,9 +43,17 @@ abstract class Metadata
      */
     protected $originalFile;
 
-    abstract protected function getMetaData();
+    abstract protected function processInfo($filePath);
 
     abstract public static function getMimeType();
+
+    /**
+     * @return IData
+     */
+    public function getInfo()
+    {
+        return $this->info;
+    }
 
     /**
      * Book constructor.
@@ -53,6 +62,7 @@ abstract class Metadata
     public function __construct(UploadedFile $file)
     {
         $this->uploadedFile = $file;
+        $this->processInfo($file->getPath() . DIRECTORY_SEPARATOR . $file->getFilename());
     }
 
     /**

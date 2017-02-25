@@ -106,7 +106,7 @@ class Book extends Resource
      *     produces={"application/json"},
      *     consumes={"multipart/form-data"},
      *     @SWG\Parameter(
-    *          description="book to upload",
+     *          description="book to upload",
      *         in="formData",
      *         name="book",
      *         required=true,
@@ -133,19 +133,19 @@ class Book extends Resource
      */
     public function add(\Silex\Application $app, Request $req)
     {
-        $id = 0;
-        if ($req->files->has('book')) {
-            $fileBag = $req->files->get('book');
-            try {
-                if (!$fileBag instanceof UploadedFile) {
-                    throw new \Exception('No file received');
-                }
-                $id = $app['orm.em']->getRepository('doctrine:Book')->addBook($fileBag);
-            } catch (\Exception $e) {
-                return new ErrorResponse($e->getMessage());
+        try {
+            if (!$req->files->has('book')) {
+                throw new \Exception('No file received');
             }
+            $fileBag = $req->files->get('book');
+            if (!$fileBag instanceof UploadedFile) {
+                throw new \Exception('No file received');
+            }
+            $id = $app['orm.em']->getRepository('doctrine:Book')->addBook($fileBag);
+            return new CreatedResponse("/book/$id");
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
         }
-        return new CreatedResponse("/book/$id");
     }
 
     /**
@@ -297,7 +297,7 @@ class Book extends Resource
                 throw new \Exception('path to file is incorrect');
             }
             $mime = $driver->getMimeType();
-            return $app->stream(function() use ($descriptor) {
+            return $app->stream(function () use ($descriptor) {
                 echo stream_get_contents($descriptor);
             }, 200, array("Content-Type" => $mime));
 

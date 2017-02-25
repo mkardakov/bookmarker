@@ -116,6 +116,14 @@ class Book
     private $bookCovers;
 
     /**
+     * @var string
+     * @ORM\Column(type="text", length=1000)
+     * @JMS\Expose
+     * @SWG\Property()
+     */
+    private $description = '';
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -401,6 +409,27 @@ class Book
     {
         return $this->bookCovers;
     }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this;
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+
 
     /**
      * @JMS\VirtualProperty
