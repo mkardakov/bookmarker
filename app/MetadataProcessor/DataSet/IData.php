@@ -27,6 +27,8 @@ interface IData
 
     public function getCover();
 
+    public function getDescription();
+
     public function toArray();
 
 }
