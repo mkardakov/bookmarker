@@ -31,13 +31,26 @@ class BookRepository extends Repository
         }
         $fileInfo = $metadata->getFileDriver()->getFileInfo();
         $bookEntity = new Entities\Book();
-        $app = Registry::get('app');
-        $user = $app['security.token_storage']->getToken()->getUser();
+        $collectedInfo = $metadata->getInfo();
+        if (empty($collectedInfo->getTitle())) {
+            $collectedInfo->setTitle($fileInfo['filename']);
+        }
+        // retrieve parsed surnames of Authors try to find them at database
+        $authors = $collectedInfo->getAuthors();
+        if (!empty($authors)) {
+            $authorEntities = $em->getRepository('doctrine:Author')->findBy(array('surname' => $authors));
+            if (!empty($authors)) {
+                foreach ($authorEntities as $authorEntity) {
+                    $bookEntity->addAuthor($authorEntity);
+                }
+            }
+        }
+        // prefill by collected metadata
+        $this->fillBookEntity($bookEntity, $collectedInfo->toArray());
+
         $bookEntity->setExt($fileInfo['extension'])
-            ->setFilePath($fileInfo['dirname'] . DIRECTORY_SEPARATOR . $fileInfo['basename'])
-            ->setTitle($fileInfo['filename'])
-            ->setMime($metadata->getFileDriver()->getMimeType())
-            ->setUser($user);
+            ->setFilePath($metadata->getFileDriver()->getFilePath())
+            ->setMime($metadata->getFileDriver()->getMimeType());
         $em->persist($bookEntity);
         $em->flush();
         return $bookEntity->getId();
@@ -112,6 +125,9 @@ class BookRepository extends Repository
         }
         if (array_key_exists('lang', $params)) {
             $book->setLang($params['lang']);
+        }
+        if (array_key_exists('description', $params)) {
+            $book->setDescription($params['description']);
         }
         if (isset($params['genre_id']) && $params['genre_id'] > 0) {
             $genreEntity = $em->find('doctrine:Genre', $params['genre_id']);

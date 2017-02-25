@@ -7,6 +7,8 @@
  */
 
 namespace Bookmarker\MetadataProcessor;
+
+use Bookmarker\FileDrivers\LocalDriver;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -21,7 +23,8 @@ class MetadataFactory
      */
     protected static $map = array(
         Pdf::MIME => '\Bookmarker\MetadataProcessor\Pdf',
-        Txt::MIME => '\Bookmarker\MetadataProcessor\Txt'
+        Txt::MIME => '\Bookmarker\MetadataProcessor\Txt',
+        Mobi::MIME => '\Bookmarker\MetadataProcessor\Mobi'
     );
 
     /**
@@ -31,7 +34,8 @@ class MetadataFactory
      */
     public function __invoke(UploadedFile $file)
     {
-        $mime = $file->getMimeType();
+        $driver = new LocalDriver($file, true);
+        $mime = $driver->getMimeType();
         if (!isset(self::$map[$mime])) {
             throw new \ErrorException('Invalid mime type of the file');
         }

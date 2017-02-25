@@ -2,24 +2,23 @@
 /**
  * Created by PhpStorm.
  * User: mkardakov
- * Date: 1/4/17
- * Time: 7:34 PM
+ * Date: 2/23/17
+ * Time: 11:11 PM
  */
 
 namespace Bookmarker\MetadataProcessor;
 
 use Bookmarker\MetadataProcessor\DataSet\Storage;
 use Bookmarker\MetadataProcessor\Exiftool\ExiftoolHelper;
-
 /**
- * Class Pdf
+ * Class Mobi
  * @package Bookmarker\MetadataProcessor
  */
-class Pdf extends Metadata
+class Mobi extends Metadata
 {
     use ExiftoolHelper;
 
-    const MIME = 'application/pdf';
+    const MIME = 'application/x-mobipocket-ebook';
 
     /**
      * @var Storage

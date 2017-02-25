@@ -9,7 +9,7 @@ production:
       charset: utf8
 local:
   debug: true
-  max_record_number: 5
+  max_record_number: 50
   database:
       driver: pdo_mysql
       host: 172.17.0.1

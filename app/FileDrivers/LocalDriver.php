@@ -9,12 +9,11 @@
 namespace Bookmarker\FileDrivers;
 
 
-use Bookmarker\FileDrivers\Adapters\LocalDriverAdapter;
+use Bookmarker\MetadataProcessor\Exiftool\BookReader;
 use Bookmarker\Registry;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Monolog\Logger;
 
 /**
  * Class LocalDriver
@@ -77,7 +76,24 @@ class LocalDriver implements IDriver
      */
     public function getMimeType()
     {
-        return $this->file->getMimeType();
+        static $mime;
+        if (is_null($mime)) {
+            $mime = $this->file->getMimeType();
+            // if mime type unknown try to get from exiftool
+            if ($mime === IDriver::DEFAULT_MIME_TYPE) {
+                $logger = new Logger('exiftool');
+                $reader = BookReader::create($logger);
+                $metadataBag = $reader->files($this->file->getRealPath())->first();
+                foreach ($metadataBag as $meta) {
+                    $tagName = $meta->getTag()->getName();
+                    if (0 === strcasecmp($tagName, 'MIMEType')) {
+                        $mime = $meta->getValue()->asString();
+                        break;
+                    }
+                }
+            }
+        }
+        return $mime;
     }
 
 
@@ -97,4 +113,8 @@ class LocalDriver implements IDriver
         return pathinfo($this->file->getRealPath());
     }
 
+    public function getFilePath()
+    {
+        return $this->file->getRealPath();
+    }
 }

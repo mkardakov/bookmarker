@@ -14,6 +14,9 @@ namespace Bookmarker\FileDrivers;
  */
 interface IDriver
 {
+
+    const DEFAULT_MIME_TYPE = 'application/octet-stream';
+
     public function store();
 
     public function getDownloadLink();
@@ -23,4 +26,6 @@ interface IDriver
     public function delete();
 
     public function getFileInfo();
+
+    public function getFilePath();
 }
