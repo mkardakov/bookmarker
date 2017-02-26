@@ -77,6 +77,27 @@ book_cover_download:
     file: '\w+'
     ext: 'png|jpe?g'
 
+book_vote_get:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::getRating' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+
+book_vote_put:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::voteForBook' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+book_vote_delete:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::deleteVote' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+
 genre_list:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::listGenres' }

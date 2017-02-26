@@ -130,7 +130,7 @@ class User extends Resource
     public function add(Application $app, Request $req)
     {
         try {
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $id = $app['orm.em']->getRepository('doctrine:User')->add($data);
         } catch(\Exception $e) {
             return new ErrorResponse($e->getMessage());
@@ -177,7 +177,7 @@ class User extends Resource
     public function replace(Application $app, Request $req, $id)
     {
         try {
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $user = $app['orm.em']->find('doctrine:User', $id);
             if (!$user instanceof Entities\User) {
                 throw new NotFoundHttpException('Requested user not found');

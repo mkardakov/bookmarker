@@ -190,10 +190,7 @@ class Genre extends Resource
     public function replace(Application $app, Request $req, $id)
     {
         try {
-            $data = json_decode($req->getContent(), true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(json_last_error_msg());
-            }
+            $data = $this->getNotEmptyBody($req);
             $genre = $app['orm.em']->find('doctrine:Genre', $id);
             if (!$genre instanceof Entities\Genre) {
                 throw new NotFoundHttpException('Requested genre not found');

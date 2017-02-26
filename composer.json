@@ -20,7 +20,8 @@
     "jdesrosiers/silex-jms-serializer-provider": "~1.0",
     "symfony/security": "^3.2",
     "monolog/monolog": "^1.22",
-    "phpexiftool/phpexiftool": "*"
+    "phpexiftool/phpexiftool": "*",
+    "symfony/debug": "*"
   },
   "config": {
     "bin-dir": "bin"

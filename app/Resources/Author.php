@@ -138,7 +138,7 @@ class Author extends Resource
     public function add(Application $app, Request $req)
     {
         try {
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $id = $app['orm.em']->getRepository('doctrine:Author')->addAuthor($data);
         } catch(\Exception $e) {
             return new ErrorResponse($e->getMessage());
@@ -194,7 +194,7 @@ class Author extends Resource
     public function replace(Application $app, Request $req, $id)
     {
         try {
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $author = $app['orm.em']->find('doctrine:Author', $id);
             if (!$author instanceof Entities\Author) {
                 throw new NotFoundHttpException('Requested author not found');
