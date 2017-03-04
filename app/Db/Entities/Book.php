@@ -124,12 +124,20 @@ class Book
     private $description = '';
 
     /**
+     * @var Comments[]
+     * @ORM\OneToMany(targetEntity="Comments", mappedBy="book")
+     * @SWG\Property()
+     */
+    private $comments;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->authors = new \Doctrine\Common\Collections\ArrayCollection();
         $this->bookCovers = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -445,5 +453,37 @@ class Book
         if (!$main->isEmpty()) {
             return $main->first()->getDownloadLink();
         }
+    }
+
+    /**
+     * Add comment
+     * @param Comments $comment
+     * @return $this
+     */
+    public function addComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+        $this->comment[] = $comment;
+
+        return $this;
+    }
+
+    /**
+     * Remove comment
+     *
+     * @param \Bookmarker\Db\Entities\Comments $comment
+     */
+    public function removeComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+        $this->comments->removeElement($comment);
+    }
+
+    /**
+     * Get Comments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getComments()
+    {
+        return $this->comments;
     }
 }

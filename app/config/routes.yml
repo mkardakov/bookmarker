@@ -98,6 +98,42 @@ book_vote_delete:
   requirements:
     id: '\d+'
 
+book_comments_list:
+  path: /book/{id}/comments
+  defaults: { _controller: 'Bookmarker\Resources\Book::listComments' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+book_comment_get:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::getComment' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_put:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::updateComment' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_delete:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::deleteComment' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_post:
+  path: /book/{id}/comments
+  defaults: { _controller: 'Bookmarker\Resources\Book::addComment' }
+  methods: ['POST']
+
 genre_list:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::listGenres' }
