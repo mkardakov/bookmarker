@@ -22,9 +22,10 @@ class MetadataFactory
      * @var array
      */
     protected static $map = array(
-        Pdf::MIME => '\Bookmarker\MetadataProcessor\Pdf',
-        Txt::MIME => '\Bookmarker\MetadataProcessor\Txt',
-        Mobi::MIME => '\Bookmarker\MetadataProcessor\Mobi'
+        '\Bookmarker\MetadataProcessor\Pdf',
+        '\Bookmarker\MetadataProcessor\Txt',
+        '\Bookmarker\MetadataProcessor\Mobi',
+        '\Bookmarker\MetadataProcessor\Epub',
     );
 
     /**
@@ -36,9 +37,32 @@ class MetadataFactory
     {
         $driver = new LocalDriver($file, true);
         $mime = $driver->getMimeType();
-        if (!isset(self::$map[$mime])) {
-            throw new \ErrorException('Invalid mime type of the file');
+        if ($class = $this->fetchClassByMime($mime)) {
+            return new $class($file);
         }
-        return new self::$map[$mime]($file);
+        throw new \ErrorException('Invalid mime type of the file');
+    }
+
+    /**
+     * Gets handler class by Mime type
+     * @param string $mime
+     * @return bool|string
+     * @throws \ErrorException
+     */
+    protected function fetchClassByMime($mime)
+    {
+        foreach (self::$map as $metaClass) {
+            if (!class_exists($metaClass)) {
+                throw new \ErrorException(sprintf(
+                    'Invalid configuration of metadata map. Class %s not exist',
+                    $metaClass
+                ));
+            }
+            $mimeTypes = $metaClass::getMimeType();
+            if (in_array($mime, $mimeTypes)) {
+                return $metaClass;
+            }
+        }
+        return false;
     }
 }

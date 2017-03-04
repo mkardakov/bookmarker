@@ -46,7 +46,9 @@ trait ExiftoolHelper
                 $value = $metadata->getValue()->asString();
                 switch($tagName) {
                     case 'Title':
-                        $storage->setTitle($value);
+                        if ($title = $this->getTitleFromRaw($value)) {
+                            $storage->setTitle($title);
+                        }
                         break;
                     case 'Language':
                         if ($lang = $this->getLangFromRaw($value)) {
@@ -66,7 +68,9 @@ trait ExiftoolHelper
                         }
                         break;
                     case 'Description':
-                        $storage->setDescription($value);
+                        if ($description = $this->getDescriptionFromRaw($value)) {
+                            $storage->setDescription($description);
+                        }
                         break;
                     default:
                         break;
@@ -112,5 +116,23 @@ trait ExiftoolHelper
     {
         preg_match_all('/\p{L}{2,}/iu', $authors, $matches);
         return !empty($matches[0]) ? $matches[0] : false;
+    }
+
+    /**
+     * @param $title
+     * @return mixed
+     */
+    protected function getTitleFromRaw($title)
+    {
+        return $title;
+    }
+
+    /**
+     * @param $description
+     * @return mixed
+     */
+    protected function getDescriptionFromRaw($description)
+    {
+        return $description;
     }
 }

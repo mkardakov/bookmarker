@@ -38,7 +38,7 @@ book_download:
   methods: ['GET']
   requirements:
     file: '\w+'
-    ext: 'pdf|txt'
+    ext: 'pdf|txt|mobi|epub'
 
 book_covers_list:
   path: /book/{id}/covers

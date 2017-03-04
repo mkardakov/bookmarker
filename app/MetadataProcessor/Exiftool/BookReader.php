@@ -8,7 +8,9 @@
 
 namespace Bookmarker\MetadataProcessor\Exiftool;
 
+use PHPExiftool\RDFParser;
 use PHPExiftool\Reader;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class BookReader
@@ -55,6 +57,11 @@ class BookReader extends Reader
     {
         $this->withEmbedded = $withEmbedded;
         return $this;
+    }
+
+    public static function create(LoggerInterface $logger)
+    {
+        return new static(new BookExiftool($logger), new RDFParser());
     }
 
 }

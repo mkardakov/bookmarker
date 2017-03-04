@@ -23,3 +23,5 @@ local:
   file_storage:
       local:
         path: storage/user/books
+  meta_data:
+      exiftool_binary_path : /usr/bin/exiftool

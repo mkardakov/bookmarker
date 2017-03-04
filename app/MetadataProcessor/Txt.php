@@ -16,14 +16,12 @@ use Bookmarker\MetadataProcessor\DataSet\Storage;
 class Txt extends Metadata
 {
 
-    const MIME = 'text/plain';
-
     /**
      * @return string
      */
     public static function getMimeType()
     {
-        return self::MIME;
+        return ['text/plain'];
     }
 
     /**

@@ -2,20 +2,19 @@
 /**
  * Created by PhpStorm.
  * User: mkardakov
- * Date: 1/4/17
- * Time: 7:34 PM
+ * Date: 2/23/17
+ * Time: 11:11 PM
  */
 
 namespace Bookmarker\MetadataProcessor;
 
 use Bookmarker\MetadataProcessor\DataSet\Storage;
 use Bookmarker\MetadataProcessor\Exiftool\ExiftoolHelper;
-
 /**
- * Class Pdf
+ * Class Mobi
  * @package Bookmarker\MetadataProcessor
  */
-class Pdf extends Metadata
+class Epub extends Metadata
 {
     use ExiftoolHelper;
 
@@ -29,7 +28,7 @@ class Pdf extends Metadata
      */
     public static function getMimeType()
     {
-        return ['application/pdf'];
+        return ['application/zip', 'application/epub+zip'];
     }
 
     /**

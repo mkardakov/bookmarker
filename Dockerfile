@@ -5,6 +5,7 @@ ADD httpd/php.ini /usr/local/etc/php/
 
 RUN  apt-get update && apt-get install -y \
   libssl-dev vim \
+  && exiftool \
   && a2enmod rewrite \
   && a2enmod headers \
   && pecl install xdebug \

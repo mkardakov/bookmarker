@@ -18,8 +18,6 @@ class Mobi extends Metadata
 {
     use ExiftoolHelper;
 
-    const MIME = 'application/x-mobipocket-ebook';
-
     /**
      * @var Storage
      */
@@ -30,7 +28,7 @@ class Mobi extends Metadata
      */
     public static function getMimeType()
     {
-        return self::MIME;
+        return ['application/x-mobipocket-ebook'];
     }
 
     /**
