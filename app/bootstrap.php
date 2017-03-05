@@ -10,6 +10,8 @@ use Symfony\Component\Routing\RouteCollection;
 use Dflydev\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 use Silex\Application;
 
+\Symfony\Component\Debug\ErrorHandler::register();
+
 $app = new Application();
 $app->register(new \DerAlex\Pimple\YamlConfigServiceProvider(ROOT . '/app/config/settings.yml'));
 

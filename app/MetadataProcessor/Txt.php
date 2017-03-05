@@ -7,6 +7,7 @@
  */
 
 namespace Bookmarker\MetadataProcessor;
+use Bookmarker\MetadataProcessor\DataSet\Storage;
 
 /**
  * Class Txt
@@ -15,15 +16,20 @@ namespace Bookmarker\MetadataProcessor;
 class Txt extends Metadata
 {
 
-    const MIME = 'text/plain';
-
-    protected function getMetaData()
-    {
-        return [];
-    }
-
+    /**
+     * @return string
+     */
     public static function getMimeType()
     {
-        return self::MIME;
+        return ['text/plain'];
+    }
+
+    /**
+     * @param $filePath
+     * @return Storage
+     */
+    protected function processInfo($filePath)
+    {
+        $this->info = new Storage();
     }
 }

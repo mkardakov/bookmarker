@@ -111,9 +111,22 @@ class Book
     /**
      * @var BookCovers[]
      * @ORM\OneToMany(targetEntity="BookCovers", mappedBy="book")
-     * @SWG\Property()
      */
     private $bookCovers;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", length=1000)
+     * @JMS\Expose
+     * @SWG\Property(type="string")
+     */
+    private $description = '';
+
+    /**
+     * @var Comments[]
+     * @ORM\OneToMany(targetEntity="Comments", mappedBy="book")
+     */
+    private $comments;
 
     /**
      * Constructor
@@ -122,6 +135,7 @@ class Book
     {
         $this->authors = new \Doctrine\Common\Collections\ArrayCollection();
         $this->bookCovers = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -403,6 +417,27 @@ class Book
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this;
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+
+
+    /**
      * @JMS\VirtualProperty
      * @JMS\SerializedName("cover")
      * @return string
@@ -416,5 +451,37 @@ class Book
         if (!$main->isEmpty()) {
             return $main->first()->getDownloadLink();
         }
+    }
+
+    /**
+     * Add comment
+     * @param Comments $comment
+     * @return $this
+     */
+    public function addComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+        $this->comment[] = $comment;
+
+        return $this;
+    }
+
+    /**
+     * Remove comment
+     *
+     * @param \Bookmarker\Db\Entities\Comments $comment
+     */
+    public function removeComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+        $this->comments->removeElement($comment);
+    }
+
+    /**
+     * Get Comments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getComments()
+    {
+        return $this->comments;
     }
 }

@@ -38,7 +38,7 @@ book_download:
   methods: ['GET']
   requirements:
     file: '\w+'
-    ext: 'pdf|txt'
+    ext: 'pdf|txt|mobi|epub'
 
 book_covers_list:
   path: /book/{id}/covers
@@ -76,6 +76,63 @@ book_cover_download:
     id: '\d+'
     file: '\w+'
     ext: 'png|jpe?g'
+
+book_vote_get:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::getRating' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+
+book_vote_put:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::voteForBook' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+
+book_vote_delete:
+  path: /book/{id}/votes
+  defaults: { _controller: 'Bookmarker\Resources\Book::deleteVote' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+
+book_comments_list:
+  path: /book/{id}/comments
+  defaults: { _controller: 'Bookmarker\Resources\Book::listComments' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+book_comment_get:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::getComment' }
+  methods: ['GET']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_put:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::updateComment' }
+  methods: ['PUT', 'PATCH']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_delete:
+  path: /book/{id}/comments/{comment_id}
+  defaults: { _controller: 'Bookmarker\Resources\Book::deleteComment' }
+  methods: ['DELETE']
+  requirements:
+    id: '\d+'
+    comment_id: '\d+'
+
+book_comment_post:
+  path: /book/{id}/comments
+  defaults: { _controller: 'Bookmarker\Resources\Book::addComment' }
+  methods: ['POST']
 
 genre_list:
   path: /genre

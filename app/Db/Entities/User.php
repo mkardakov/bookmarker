@@ -78,7 +78,7 @@ class User implements UserInterface
     protected $roles;
 
     /**
-     * @var Books[]
+     * @var Book[]
      * @ORM\OneToMany(targetEntity="Book", mappedBy="user")
      */
     protected $books;

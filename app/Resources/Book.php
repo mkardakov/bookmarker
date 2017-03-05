@@ -8,6 +8,7 @@
 
 namespace Bookmarker\Resources;
 
+use Bookmarker\Db\Repositories\VotesRepository;
 use Bookmarker\FileDrivers\LocalDriver;
 use Bookmarker\Responses\CreatedResponse;
 use Bookmarker\Responses\ErrorResponse;
@@ -106,7 +107,7 @@ class Book extends Resource
      *     produces={"application/json"},
      *     consumes={"multipart/form-data"},
      *     @SWG\Parameter(
-    *          description="book to upload",
+     *          description="book to upload",
      *         in="formData",
      *         name="book",
      *         required=true,
@@ -133,19 +134,19 @@ class Book extends Resource
      */
     public function add(\Silex\Application $app, Request $req)
     {
-        $id = 0;
-        if ($req->files->has('book')) {
-            $fileBag = $req->files->get('book');
-            try {
-                if (!$fileBag instanceof UploadedFile) {
-                    throw new \Exception('No file received');
-                }
-                $id = $app['orm.em']->getRepository('doctrine:Book')->addBook($fileBag);
-            } catch (\Exception $e) {
-                return new ErrorResponse($e->getMessage());
+        try {
+            if (!$req->files->has('book')) {
+                throw new \Exception('No file received');
             }
+            $fileBag = $req->files->get('book');
+            if (!$fileBag instanceof UploadedFile) {
+                throw new \Exception('No file received');
+            }
+            $id = $app['orm.em']->getRepository('doctrine:Book')->addBook($fileBag);
+            return new CreatedResponse("/book/$id");
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
         }
-        return new CreatedResponse("/book/$id");
     }
 
     /**
@@ -217,7 +218,7 @@ class Book extends Resource
             if (!$book instanceof Entities\Book) {
                 throw new NotFoundHttpException('Requested resource not found');
             }
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $app['orm.em']->getRepository('doctrine:Book')->updateBook($book, $data);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
@@ -297,7 +298,7 @@ class Book extends Resource
                 throw new \Exception('path to file is incorrect');
             }
             $mime = $driver->getMimeType();
-            return $app->stream(function() use ($descriptor) {
+            return $app->stream(function () use ($descriptor) {
                 echo stream_get_contents($descriptor);
             }, 200, array("Content-Type" => $mime));
 
@@ -520,7 +521,7 @@ class Book extends Resource
             if (!($book instanceof Entities\Book && $bookCover instanceof Entities\BookCovers)) {
                 throw new NotFoundHttpException('Requested resource not found');
             }
-            $data = $this->getBody($req);
+            $data = $this->getNotEmptyBody($req);
             $app['orm.em']->getRepository('doctrine:Book')->updateBookCover($bookCover, $data);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
@@ -552,7 +553,7 @@ class Book extends Resource
      *     format="int64",
      *     minimum=1.0
      *   ),
-     *   @SWG\Response(response=400, description="Invalid ID supplied"),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
      *   @SWG\Response(response=404, description="Book or Book cover not found"),
      *   @SWG\Response(response=200, description="success")
      * )
@@ -575,6 +576,408 @@ class Book extends Resource
             return new ErrorResponse($e->getMessage());
         }
         return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/votes",
+     *     summary="Compute rating of book based on user votes",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="vote scalar value",
+     *         @SWG\Schema(
+     *             type="float"
+     *         )
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book or Book cover not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param int $id
+     * @return ErrorResponse|Response
+     */
+    public function getRating(\Silex\Application $app, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $rating = $app['orm.em']->getRepository('doctrine:Votes')->getRating($book);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response($app['serializer']->serialize($rating, RESPONSE_FORMAT), 200);
+    }
+
+    /**
+     * @SWG\Put(
+     *     path="/book/{id}/votes",
+     *     operationId="replace",
+     *     summary="Allows user to re-vote for book",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Vote object with values 1..5",
+     *         required=true,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="vote",
+     *                      type="integer"
+     *                  )
+     *         ),
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book not found"),
+     *   @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param $id
+     * @return ErrorResponse|Response
+     */
+    public function voteForBook(\Silex\Application $app, Request $req, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $data = $this->getNotEmptyBody($req);
+            $result = $app['orm.em']->getRepository('doctrine:Votes')->voteForBook($book, $data);
+            $status = ($result === VotesRepository::VOTE_CREATED) ? 201 : 200;
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', $status);
+    }
+
+    /**
+     * @SWG\Delete(path="/book/{id}/votes",
+     *   summary="Delete user`s vote only",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="ID of the book that needs to be deleted",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book not found"),
+     *   @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param $id
+     * @return ErrorResponse|Response
+     */
+    public function deleteVote(\Silex\Application $app, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $app['orm.em']->getRepository('doctrine:Votes')->deleteVote($book);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Post(
+     *     path="/book/{id}/comments",
+     *     operationId="addComment",
+     *     summary="Add new comment to the book",
+     *     produces={"application/json"},
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Text which will be added as a comment",
+     *         required=true,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="text",
+     *                      type="string"
+     *                  )
+     *         ),
+     *     ),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="comment is created successfully",
+     *         @SWG\Schema(
+     *           type="object",
+     *           additionalProperties={
+     *            "contentUri":"string"
+     *           }
+     *         ),
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param $id
+     * @return CreatedResponse|ErrorResponse
+     */
+    public function addComment(\Silex\Application $app, Request $req, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $data = $this->getNotEmptyBody($req);
+            $comment = $app['orm.em']->getRepository('doctrine:Comments')->addComment($book, $data);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new CreatedResponse(sprintf("/book/%d/comments/%d", $book->getId(), $comment->getId()));
+    }
+
+    /**
+     * @SWG\Delete(path="/book/{id}/comments/{comment_id}",
+     *   summary="Delete comment by ID",
+     *   operationId="removeComment",
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="ID of the book that needs to be deleted",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *   @SWG\Parameter(
+     *     name="comment_id",
+     *     in="path",
+     *     description="ID of the comment",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book or comment not found"),
+     *   @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param $id
+     * @param $comment_id
+     * @return ErrorResponse|Response
+     */
+    public function deleteComment(\Silex\Application $app, $id, $comment_id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            $comment = $app['orm.em']->find('doctrine:Comments', $comment_id);
+            if (!($book instanceof Entities\Book && $comment instanceof Entities\Comments)) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $app['orm.em']->getRepository('doctrine:Comments')->deleteComment($comment);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Put(
+     *     path="/book/{id}/comments/{comment_id}",
+     *     operationId="replaceComment",
+     *     summary="Allows user to change his comment",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *      @SWG\Parameter(
+     *         description="ID of comment to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="comment_id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Comment to replace",
+     *         required=true,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="text",
+     *                      type="string"
+     *                  )
+     *         ),
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book or comment not found"),
+     *   @SWG\Response(response=200, description="success")
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param int $id
+     * @param int $comment_id
+     * @return CreatedResponse|ErrorResponse
+     */
+    public function updateComment(\Silex\Application $app, Request $req, $id, $comment_id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            $comment = $app['orm.em']->find('doctrine:Comments', $comment_id);
+            if (!($book instanceof Entities\Book && $comment instanceof Entities\Comments)) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $data = $this->getNotEmptyBody($req);
+            $app['orm.em']->getRepository('doctrine:Comments')->updateComment($comment, $data);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/comments",
+     *     summary="Retrieve all comments belong to particular book",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Parameter(
+     *        name="id",
+     *        in="path",
+     *        description="ID of the target book",
+     *        required=true,
+     *        type="integer",
+     *        format="int64",
+     *        minimum=1.0
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="book comments",
+     *         @SWG\Schema(
+     *           type="array",
+     *           @SWG\Items(ref="#/definitions/Comments")
+     *         )
+     *     ),
+     *     @SWG\Response(response=404, description="Book not found"),
+     * )
+     * @todo limitation of comments
+     * @param \Silex\Application $app
+     * @param $id
+     * @return ErrorResponse|Response
+     */
+    public function listComments(\Silex\Application $app, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $comments = $book->getComments();
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response($app['serializer']->serialize($comments, RESPONSE_FORMAT), 200);
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/comments/{comment_id}",
+     *     summary="Compute rating of book based on user votes",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *      @SWG\Parameter(
+     *         description="ID of comment to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="comment_id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="comment info",
+     *         @SWG\Schema(ref="#/definitions/Comments")
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book or Book cover not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param int $id
+     * @param int $comment_id
+     * @return ErrorResponse|Response
+     */
+    public function getComment(\Silex\Application $app, $id, $comment_id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            $comment = $app['orm.em']->find('doctrine:Comments', $comment_id);
+            if (!($book instanceof Entities\Book && $comment instanceof Entities\Comments)) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response($app['serializer']->serialize($comment, RESPONSE_FORMAT), 200);
     }
 
 }

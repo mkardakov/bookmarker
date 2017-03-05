@@ -64,10 +64,10 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers'];
+            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers'];
+        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments'];
     }
 
     /**
@@ -444,12 +444,67 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
     /**
      * {@inheritDoc}
      */
+    public function getDescription()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDescription', []);
+
+        return parent::getDescription();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDescription($description)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDescription', [$description]);
+
+        return parent::setDescription($description);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getMainCover()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMainCover', []);
 
         return parent::getMainCover();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addComment', [$comment]);
+
+        return parent::addComment($comment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeComment(\Bookmarker\Db\Entities\Comments $comment)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeComment', [$comment]);
+
+        return parent::removeComment($comment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getComments()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getComments', []);
+
+        return parent::getComments();
     }
 
 }

@@ -36,7 +36,7 @@ abstract class Resource
 
     /**
      * @param Request $req
-     * @return mixed
+     * @return array
      * @throws \Exception
      */
     protected function getBody(Request $req)
@@ -44,6 +44,20 @@ abstract class Resource
         $data = json_decode($req->getContent(), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception(json_last_error_msg());
+        }
+        return $data;
+    }
+
+    /**
+     * @param Request $req
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    protected function getNotEmptyBody(Request $req)
+    {
+        $data = $this->getBody($req);
+        if (empty($data)) {
+            throw new \InvalidArgumentException('Received data is incorrect');
         }
         return $data;
     }

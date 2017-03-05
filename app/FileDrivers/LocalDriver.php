@@ -9,12 +9,11 @@
 namespace Bookmarker\FileDrivers;
 
 
-use Bookmarker\FileDrivers\Adapters\LocalDriverAdapter;
+use Bookmarker\MetadataProcessor\Exiftool\BookReader;
 use Bookmarker\Registry;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Monolog\Logger;
 
 /**
  * Class LocalDriver
@@ -27,6 +26,16 @@ class LocalDriver implements IDriver
      * @var File
      */
     protected $file;
+
+    /**
+     * @var string
+     */
+    protected $mime;
+
+    /**
+     * @var string
+     */
+    protected $ext;
 
     /**
      * LocalDriver constructor.
@@ -43,6 +52,7 @@ class LocalDriver implements IDriver
                 DIRECTORY_SEPARATOR . $fileName;
         }
         $this->file = new File($fullFileName);
+        $this->loadMetaInformation();
     }
 
     /**
@@ -56,7 +66,7 @@ class LocalDriver implements IDriver
         if (!is_dir($path)) {
             mkdir($path, 0757, true);
         }
-        $this->file = $this->file->move($path, md5(time()) . '.' . $this->file->guessExtension());
+        $this->file = $this->file->move($path, md5(time()) . '.' . $this->getExt());
         return $this->file->isFile();
     }
 
@@ -73,12 +83,51 @@ class LocalDriver implements IDriver
     }
 
     /**
-     * @return null|string
+     * Preloads Mime and extension
+     */
+    protected function loadMetaInformation()
+    {
+        try {
+            $logger = new Logger('exiftool');
+            $reader = BookReader::create($logger);
+            $metadataBag = $reader->files($this->file->getRealPath())->first();
+            foreach ($metadataBag as $meta) {
+                $tagName = $meta->getTag()->getName();
+                if (0 === strcasecmp($tagName, 'MIMEType')) {
+                    $this->mime = $meta->getValue()->asString();
+                }
+                if (0 === strcasecmp($tagName, 'FileType')) {
+                    $this->ext = strtolower($meta->getValue()->asString());
+                }
+                if ($this->ext && $this->mime) {
+                    break;
+                }
+            }
+        } catch (\Exception $e) {
+            $logger->addNotice($e->getMessage());
+        }
+        finally {
+            $this->mime = empty($this->mime) ? $this->file->getMimeType() : $this->mime;
+            $this->ext = empty($this->ext) ? $this->file->guessExtension(): $this->ext;
+        }
+    }
+
+    /**
+     * @return string|null
      */
     public function getMimeType()
     {
-        return $this->file->getMimeType();
+        return $this->mime;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getExt()
+    {
+        return $this->ext;
+    }
+
 
 
     /**
@@ -97,4 +146,8 @@ class LocalDriver implements IDriver
         return pathinfo($this->file->getRealPath());
     }
 
+    public function getFilePath()
+    {
+        return $this->file->getRealPath();
+    }
 }

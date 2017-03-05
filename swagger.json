@@ -160,11 +160,14 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Author object that needs to be added to the system",
+                        "description": "Author object that will be created",
                         "required": true,
                         "schema": {
                             "properties": {
                                 "name": {
+                                    "type": "string"
+                                },
+                                "surname": {
                                     "type": "string"
                                 }
                             }
@@ -587,10 +590,306 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Invalid ID supplied"
+                        "description": "Unexpected error occurred"
                     },
                     "404": {
                         "description": "Book or Book cover not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            }
+        },
+        "/book/{id}/votes": {
+            "get": {
+                "summary": "Compute rating of book based on user votes",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "vote scalar value",
+                        "schema": {
+                            "type": "float"
+                        }
+                    },
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book or Book cover not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Allows user to re-vote for book",
+                "operationId": "replace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Vote object with values 1..5",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "vote": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete user`s vote only",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the book that needs to be deleted",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            }
+        },
+        "/book/{id}/comments": {
+            "get": {
+                "summary": "Retrieve all comments belong to particular book",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the target book",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "book comments",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Comments"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Add new comment to the book",
+                "operationId": "addComment",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Text which will be added as a comment",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "text": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "comment is created successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "contentUri": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    }
+                }
+            }
+        },
+        "/book/{id}/comments/{comment_id}": {
+            "get": {
+                "summary": "Compute rating of book based on user votes",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "comment_id",
+                        "in": "path",
+                        "description": "ID of comment to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comment info",
+                        "schema": {
+                            "$ref": "#/definitions/Comments"
+                        }
+                    },
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book or Book cover not found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Allows user to change his comment",
+                "operationId": "replaceComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "comment_id",
+                        "in": "path",
+                        "description": "ID of comment to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Comment to replace",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "text": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book or comment not found"
+                    },
+                    "200": {
+                        "description": "success"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete comment by ID",
+                "operationId": "removeComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the book that needs to be deleted",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    },
+                    {
+                        "name": "comment_id",
+                        "in": "path",
+                        "description": "ID of the comment",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Unexpected error occurred"
+                    },
+                    "404": {
+                        "description": "Book or comment not found"
                     },
                     "200": {
                         "description": "success"
@@ -954,11 +1253,8 @@
                 "user": {
                     "$ref": "#/definitions/User"
                 },
-                "bookCovers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/BookCover"
-                    }
+                "description": {
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -973,6 +1269,29 @@
                 },
                 "isMain": {
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "Comments": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "commentator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "datetime"
+                },
+                "modificationDate": {
+                    "type": "datetime"
                 }
             },
             "type": "object"
