@@ -101,15 +101,13 @@ class Author extends Resource
      *     @SWG\Parameter(
      *         name="body",
      *         in="body",
-     *         description="Author object that needs to be added to the system",
+     *         description="Author object that will be created",
      *         required=true,
      *         @SWG\Schema(
      *                  @SWG\Property(
      *                      property="name",
      *                      type="string"
-     *                  )
-     *         ),
-     *         @SWG\Schema(
+     *                  ),
      *                  @SWG\Property(
      *                      property="surname",
      *                      type="string"

@@ -6,6 +6,7 @@ use Bookmarker\MetadataProcessor\MetadataFactory;
 use Bookmarker\FileDrivers\LocalDriver;
 use Bookmarker\Db\Entities;
 use Bookmarker\Registry;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -195,6 +196,7 @@ class BookRepository extends Repository
     }
 
     /**
+     * Only one main cover allowed is_main = true
      * @param Entities\BookCovers $bookCover
      * @param array $params
      */
@@ -202,6 +204,19 @@ class BookRepository extends Repository
     {
         $em = $this->getEntityManager();
         if (array_key_exists('is_main', $params)) {
+            $params['is_main'] = boolval($params['is_main']);
+            // mark all other covers as non-main
+            if ($params['is_main'] === true) {
+                $filter = Criteria::create()
+                    ->where(Criteria::expr()->eq("isMain", true));
+                $existCovers = $bookCover->getBook()->getBookCovers()->matching($filter);
+                if (!empty($existCovers)) {
+                    foreach ($existCovers as $exist) {
+                        $exist->setIsMain(false);
+                        $em->persist($exist);
+                    }
+                }
+            }
             $bookCover->setIsMain($params['is_main']);
             $em->persist($bookCover);
             $em->flush();

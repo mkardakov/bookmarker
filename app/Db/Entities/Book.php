@@ -111,7 +111,6 @@ class Book
     /**
      * @var BookCovers[]
      * @ORM\OneToMany(targetEntity="BookCovers", mappedBy="book")
-     * @SWG\Property()
      */
     private $bookCovers;
 
@@ -119,14 +118,13 @@ class Book
      * @var string
      * @ORM\Column(type="text", length=1000)
      * @JMS\Expose
-     * @SWG\Property()
+     * @SWG\Property(type="string")
      */
     private $description = '';
 
     /**
      * @var Comments[]
      * @ORM\OneToMany(targetEntity="Comments", mappedBy="book")
-     * @SWG\Property()
      */
     private $comments;
 

@@ -33,11 +33,16 @@ class VotesRepository extends Repository
         $result = self::VOTE_CHANGED;
         $em = $this->getEntityManager();
         if (!isset($params['vote'])) {
-            throw new \InvalidArgumentException('some author_ids are not exist');
+            throw new \InvalidArgumentException('no vote value received');
         }
-        $voteValue = abs((int)$params['vote']);
-        $voteValue = $voteValue === 0 ? Votes::MIN_VOTE_VALUE : $voteValue;
-        $voteValue = $voteValue > Votes::MAX_VOTE_VALUE ? Votes::MAX_VOTE_VALUE : $voteValue;
+        $voteValue = (int)$params['vote'];
+        if ($voteValue < Votes::MAX_VOTE_VALUE || $voteValue > Votes::MAX_VOTE_VALUE) {
+            throw new \InvalidArgumentException(sprintf(
+                'vote value must be in %d..%d range',
+                Votes::MIN_VOTE_VALUE,
+                Votes::MAX_VOTE_VALUE
+            ));
+        }
         $app = Registry::get('app');
         $user = $app['security.token_storage']->getToken()->getUser();
         $voteEntity = $this->findOneBy(array(
