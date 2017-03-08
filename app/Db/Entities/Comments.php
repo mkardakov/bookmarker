@@ -49,7 +49,7 @@ class Comments
 
     /**
      * @var Book[]
-     * @ORM\ManyToOne(targetEntity="Book")
+     * @ORM\ManyToOne(targetEntity="Book", inversedBy="comments")
      * @ORM\JoinColumn(name="book_id", onDelete="CASCADE")
      */
     private $book;
