@@ -64,10 +64,10 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments'];
+            return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'files'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'ext', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'filePath', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'mime', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments'];
+        return ['__isInitialized__', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'id', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'title', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'year', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'lang', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'authors', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'genre', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'user', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'bookCovers', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'description', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'comments', '' . "\0" . 'Bookmarker\\Db\\Entities\\Book' . "\0" . 'files'];
     }
 
     /**
@@ -505,6 +505,39 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getComments', []);
 
         return parent::getComments();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addFile(\Bookmarker\Db\Entities\File $file)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addFile', [$file]);
+
+        return parent::addFile($file);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeFile(\Bookmarker\Db\Entities\File $file)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeFile', [$file]);
+
+        return parent::removeFile($file);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFiles()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFiles', []);
+
+        return parent::getFiles();
     }
 
 }

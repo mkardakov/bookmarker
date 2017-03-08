@@ -4,9 +4,10 @@ ADD httpd/apache2.conf /etc/apache2/apache2.conf
 ADD httpd/php.ini /usr/local/etc/php/
 
 RUN  apt-get update && apt-get install -y \
-  libssl-dev vim \
-  && exiftool \
-  && calibre-bin \
+  libssl-dev \
+  vim \
+  exiftool \
+  calibre-bin \
   && a2enmod rewrite \
   && a2enmod headers \
   && pecl install xdebug \
