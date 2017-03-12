@@ -10,6 +10,7 @@ namespace Bookmarker\Jobs\Tasks;
 
 
 use Bookmarker\Db\Entities\Book;
+use Bookmarker\Registry;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Pheanstalk\Pheanstalk;
 
@@ -58,16 +59,14 @@ class ConvertTask implements Task
         if ($filesSet->isEmpty()) {
             throw new \ErrorException('There are no files available for this book');
         }
-
-        $pheanstalk = new Pheanstalk('172.17.0.1');
+        $config = Registry::get('app')['config'][APP_ENV]['beanstalkd'];
+        $pheanstalk = new Pheanstalk($config['host']);
         $pheanstalk
-            ->useTube('testtube')
+            ->useTube($config['convert_tube'])
             ->put($this->buildCommand());
     }
 
     /**
-     * @param $from
-     * @param $to
      * @return string
      */
     protected function buildCommand()

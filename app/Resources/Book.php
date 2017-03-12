@@ -982,6 +982,39 @@ class Book extends Resource
     }
 
     /**
+     * @SWG\Post(
+     *     path="/book/{id}/convert",
+     *     summary="Convert book to requested format: MOBI, TXT, PDF, EPUB",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Requested format",
+     *         required=true,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="to",
+     *                      type="string"
+     *                  )
+     *         ),
+     *     ),
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=202,
+     *         description="Conversion task accepted by the server"
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book not found"),
+     * )
      * @param \Silex\Application $app
      * @param Request $req
      * @param $id

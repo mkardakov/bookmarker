@@ -11,15 +11,16 @@ if (!class_exists($class)) {
 $worker = new $class($app);
 $status = 0;
 
-try {
-    $pheanstalk = new \Pheanstalk\Pheanstalk('172.17.0.1');
-    $job = $pheanstalk
-        ->watch('testtube')
-        ->ignore('default')
-        ->reserve();
+$config = \Bookmarker\Registry::get('app')['config'][APP_ENV]['beanstalkd'];
 
-    $worker->accept($job);
-    $pheanstalk->delete($job);
+$pheanstalk = new \Pheanstalk\Pheanstalk($config['host']);
+$pheanstalk->watch($config['convert_tube'])
+    ->ignore('default');
+try {
+    while ($job = $pheanstalk->reserve()) {
+        $worker->accept($job);
+        $pheanstalk->delete($job);
+    }
 } catch (\Exception $e) {
     $status = 1;
     $app['logger']->addError($e);
