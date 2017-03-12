@@ -40,6 +40,11 @@ book_download:
     file: '\w+'
     ext: 'pdf|txt|mobi|epub'
 
+book_convert_to:
+  path: /book/{id}/convert
+  defaults: { _controller: 'Bookmarker\Resources\Book::convert' }
+  methods: ['POST']
+
 book_covers_list:
   path: /book/{id}/covers
   defaults: { _controller: 'Bookmarker\Resources\Book::listBookCovers' }
