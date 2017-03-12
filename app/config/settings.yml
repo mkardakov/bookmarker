@@ -25,3 +25,6 @@ local:
         path: storage/user/books
   meta_data:
       exiftool_binary_path : /usr/bin/exiftool
+  beanstalkd:
+      host: 172.17.0.1
+      convert_tube: convert_tube
