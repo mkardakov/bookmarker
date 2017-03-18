@@ -276,4 +276,15 @@ class File extends \Bookmarker\Db\Entities\File implements \Doctrine\ORM\Proxy\P
         return parent::getBook();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function getDownloadLink()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDownloadLink', []);
+
+        return parent::getDownloadLink();
+    }
+
 }

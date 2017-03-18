@@ -191,50 +191,6 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
     /**
      * {@inheritDoc}
      */
-    public function setExt($ext)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setExt', [$ext]);
-
-        return parent::setExt($ext);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getExt()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getExt', []);
-
-        return parent::getExt();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setFilePath($filePath)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFilePath', [$filePath]);
-
-        return parent::setFilePath($filePath);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getFilePath()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFilePath', []);
-
-        return parent::getFilePath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setTitle($title)
     {
 
@@ -351,39 +307,6 @@ class Book extends \Bookmarker\Db\Entities\Book implements \Doctrine\ORM\Proxy\P
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGenre', []);
 
         return parent::getGenre();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getMime()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMime', []);
-
-        return parent::getMime();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setMime($mime)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setMime', [$mime]);
-
-        return parent::setMime($mime);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDownloadLink()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDownloadLink', []);
-
-        return parent::getDownloadLink();
     }
 
     /**
