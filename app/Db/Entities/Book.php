@@ -36,20 +36,6 @@ class Book
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=4, nullable=false, options={"fixed": true})
-     * @SWG\Property(type="string")
-     */
-    private $ext;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=false, name="file_path")
-     * @SWG\Property(type="string")
-     */
-    private $filePath;
-
-    /**
-     * @var string
      * @ORM\Column(type="string", nullable=false)
      * @JMS\Expose
      * @SWG\Property(type="string")
@@ -90,14 +76,6 @@ class Book
     private $genre;
 
     /**
-     * @var string
-     * @ORM\Column(type="string")
-     * @JMS\Expose
-     * @SWG\Property()
-     */
-    private $mime;
-
-    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="User", inversedBy="books")
      * @ORM\JoinColumn(name="user_id", onDelete="CASCADE")
@@ -129,6 +107,16 @@ class Book
     private $comments;
 
     /**
+     * @var File[]
+     * @ORM\OneToMany(targetEntity="File", mappedBy="book")
+     * @JMS\Expose
+     * @SWG\Property(
+     *     @SWG\Schema(ref="#/definitions/File")
+     * )
+     */
+    private $files;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -136,6 +124,7 @@ class Book
         $this->authors = new \Doctrine\Common\Collections\ArrayCollection();
         $this->bookCovers = new \Doctrine\Common\Collections\ArrayCollection();
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->files = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -148,53 +137,6 @@ class Book
         return $this->id;
     }
 
-    /**
-     * Set ext
-     *
-     * @param string $ext
-     *
-     * @return Book
-     */
-    public function setExt($ext)
-    {
-        $this->ext = $ext;
-
-        return $this;
-    }
-
-    /**
-     * Get ext
-     *
-     * @return string
-     */
-    public function getExt()
-    {
-        return $this->ext;
-    }
-
-    /**
-     * Set filePath
-     *
-     * @param string $filePath
-     *
-     * @return Book
-     */
-    public function setFilePath($filePath)
-    {
-        $this->filePath = $filePath;
-
-        return $this;
-    }
-
-    /**
-     * Get filePath
-     *
-     * @return string
-     */
-    public function getFilePath()
-    {
-        return $this->filePath;
-    }
 
     /**
      * Set title
@@ -328,37 +270,6 @@ class Book
     }
 
     /**
-     * @return string
-     */
-    public function getMime()
-    {
-        return $this->mime;
-    }
-
-    /**
-     * @param string $mime
-     * @return $this
-     */
-    public function setMime($mime)
-    {
-        $this->mime = $mime;
-
-        return $this;
-    }
-
-    /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("book_link")
-     * @return string
-     */
-    public function getDownloadLink()
-    {
-        $metaName = pathinfo($this->getFilePath(), PATHINFO_BASENAME);
-
-        return urlencode("/book/$metaName");
-    }
-
-    /**
      * Set User
      *
      * @param \Bookmarker\Db\Entities\User $user
@@ -483,5 +394,39 @@ class Book
     public function getComments()
     {
         return $this->comments;
+    }
+
+    /**
+     * Add file
+     *
+     * @param \Bookmarker\Db\Entities\File $file
+     *
+     * @return Book
+     */
+    public function addFile(\Bookmarker\Db\Entities\File $file)
+    {
+        $this->files[] = $file;
+
+        return $this;
+    }
+
+    /**
+     * Remove file
+     *
+     * @param \Bookmarker\Db\Entities\File $file
+     */
+    public function removeFile(\Bookmarker\Db\Entities\File $file)
+    {
+        $this->files->removeElement($file);
+    }
+
+    /**
+     * Get files
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFiles()
+    {
+        return $this->files;
     }
 }

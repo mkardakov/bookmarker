@@ -96,4 +96,6 @@ $app->before(function(\Symfony\Component\HttpFoundation\Request $request) use($a
 $loader = require ROOT . 'vendor/autoload.php';
 Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(array($loader, "loadClass"));
 
+\Bookmarker\Registry::set('app', $app);
+
 return $app;

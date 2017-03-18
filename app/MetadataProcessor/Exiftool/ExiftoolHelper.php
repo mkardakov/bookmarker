@@ -22,6 +22,8 @@ trait ExiftoolHelper
      */
     protected static $supportedMetaKeys = array(
         'Title' => true,
+        'BookName' => true,
+        'PublishDate' => true,
         'Author' => true,
         'CreateDate' => true,
         'Language' => true,
@@ -45,6 +47,7 @@ trait ExiftoolHelper
             if (isset(static::$supportedMetaKeys[$tagName])) {
                 $value = $metadata->getValue()->asString();
                 switch($tagName) {
+                    case 'BookName':
                     case 'Title':
                         if ($title = $this->getTitleFromRaw($value)) {
                             $storage->setTitle($title);
@@ -55,6 +58,7 @@ trait ExiftoolHelper
                             $storage->setLang($lang);
                         }
                         break;
+                    case 'PublishDate':
                     case 'CreateDate':
                         if ($year = $this->getYearFromRaw($value)) {
                             $storage->setYear($year);

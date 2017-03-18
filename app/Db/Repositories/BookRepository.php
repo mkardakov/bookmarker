@@ -48,11 +48,13 @@ class BookRepository extends Repository
         }
         // prefill by collected metadata
         $this->fillBookEntity($bookEntity, $collectedInfo->toArray());
-
-        $bookEntity->setExt($fileInfo['extension'])
+        $em->persist($bookEntity);
+        $fileEntity = new Entities\File();
+        $fileEntity->setExt($fileInfo['extension'])
             ->setFilePath($metadata->getFileDriver()->getFilePath())
             ->setMime($metadata->getFileDriver()->getMimeType());
-        $em->persist($bookEntity);
+        $fileEntity->setBook($bookEntity);
+        $em->persist($fileEntity);
         $em->flush();
         return $bookEntity->getId();
     }
@@ -94,7 +96,9 @@ class BookRepository extends Repository
                     return false;
                 }
             };
-            $delCallback($bookEntity->getFilePath());
+            foreach ($bookEntity->getFiles() as $file) {
+                $delCallback($file->getFilePath());
+            }
             $bookEntity->getBookCovers()->forAll(function($index, Entities\BookCovers $cover) use ($delCallback) {
                 return $delCallback($cover->getImagePath());
             });

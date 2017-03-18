@@ -10,6 +10,7 @@ namespace Bookmarker\Resources;
 
 use Bookmarker\Db\Repositories\VotesRepository;
 use Bookmarker\FileDrivers\LocalDriver;
+use Bookmarker\Jobs\Tasks\ConvertTask;
 use Bookmarker\Responses\CreatedResponse;
 use Bookmarker\Responses\ErrorResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -978,6 +979,65 @@ class Book extends Resource
             return new ErrorResponse($e->getMessage());
         }
         return new Response($app['serializer']->serialize($comment, RESPONSE_FORMAT), 200);
+    }
+
+    /**
+     * @SWG\Post(
+     *     path="/book/{id}/convert",
+     *     summary="Convert book to requested format: MOBI, TXT, PDF, EPUB",
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         description="Requested format",
+     *         required=true,
+     *         @SWG\Schema(
+     *                  @SWG\Property(
+     *                      property="to",
+     *                      type="string"
+     *                  )
+     *         ),
+     *     ),
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=202,
+     *         description="Conversion task accepted by the server"
+     *     ),
+     *   @SWG\Response(response=400, description="Unexpected error occurred"),
+     *   @SWG\Response(response=404, description="Book not found"),
+     * )
+     * @param \Silex\Application $app
+     * @param Request $req
+     * @param $id
+     * @return ErrorResponse|Response
+     */
+    public function convert(\Silex\Application $app, Request $req, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            $data = $this->getNotEmptyBody($req);
+            $task = new ConvertTask();
+            $task->setBook($book)
+                ->setDataFormat($data);
+            $task->send();
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+        return new Response('', 202);
     }
 
 }
