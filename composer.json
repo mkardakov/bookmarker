@@ -21,7 +21,8 @@
     "symfony/security": "^3.2",
     "monolog/monolog": "^1.22",
     "phpexiftool/phpexiftool": "*",
-    "symfony/debug": "*"
+    "symfony/debug": "*",
+    "pda/pheanstalk": "*"
   },
   "config": {
     "bin-dir": "bin"
