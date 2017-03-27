@@ -11,6 +11,7 @@ namespace Bookmarker\Db\Repositories;
 use Bookmarker\Db\Entities\Book;
 use Bookmarker\Db\Entities\Votes;
 use Bookmarker\Registry;
+use Doctrine\ORM\AbstractQuery;
 
 /**
  * Class VotesRepository
@@ -36,7 +37,7 @@ class VotesRepository extends Repository
             throw new \InvalidArgumentException('no vote value received');
         }
         $voteValue = (int)$params['vote'];
-        if ($voteValue < Votes::MAX_VOTE_VALUE || $voteValue > Votes::MAX_VOTE_VALUE) {
+        if ($voteValue < Votes::MIN_VOTE_VALUE || $voteValue > Votes::MAX_VOTE_VALUE) {
             throw new \InvalidArgumentException(sprintf(
                 'vote value must be in %d..%d range',
                 Votes::MIN_VOTE_VALUE,
@@ -70,7 +71,7 @@ class VotesRepository extends Repository
         $dql = 'SELECT AVG(v.vote) FROM \Bookmarker\Db\Entities\Votes v WHERE v.books = :book GROUP BY v.books';
         return $this->getEntityManager()->createQuery($dql)
             ->setParameter('book', $book)
-            ->getSingleScalarResult();
+            ->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
     }
 
     /**
