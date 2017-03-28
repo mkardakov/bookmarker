@@ -241,6 +241,16 @@ user_delete:
   requirements:
     id: '\d+'
 
+user_get_books:
+  path: /user/{id}/book
+  defaults: { _controller: 'Bookmarker\Resources\User::getBooks' }
+  methods: ['GET', 'HEAD']
+
+user_get_books_redirect:
+  path: /user/book
+  methods: ['GET', 'HEAD']
+  defaults: {_controller: 'Bookmarker\Resources\User::getBooks'}
+
 role_list:
   path: /role
   defaults: { _controller: 'Bookmarker\Resources\Role::listRoles' }

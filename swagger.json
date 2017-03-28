@@ -1246,6 +1246,58 @@
                     }
                 }
             }
+        },
+        "/user/{id}/book": {
+            "get": {
+                "summary": "Retrieve all books of specified user",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the requested user. Use id = me to access current user",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    },
+                    {
+                        "name": "max_record_number",
+                        "in": "query",
+                        "description": "limitation param",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "books set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/user/book": {
+            "get": {
+                "responses": {
+                    "301": {
+                        "description": "Permanent redirect to current user`s space /user/me/book"
+                    }
+                }
+            }
         }
     },
     "definitions": {

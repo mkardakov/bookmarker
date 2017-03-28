@@ -11,6 +11,7 @@ namespace Bookmarker\Resources;
 use Bookmarker\Responses\CreatedResponse;
 use Bookmarker\Responses\ErrorResponse;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Bookmarker\Db\Entities;
@@ -21,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class User extends Resource
 {
+
+    const CURRENT_USER_ALIAS = 'me';
 
     /**
      * @SWG\Get(
@@ -132,7 +135,7 @@ class User extends Resource
         try {
             $data = $this->getNotEmptyBody($req);
             $id = $app['orm.em']->getRepository('doctrine:User')->add($data);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return new ErrorResponse($e->getMessage());
         }
         return new CreatedResponse("/user/$id");
@@ -185,7 +188,7 @@ class User extends Resource
             $app['orm.em']->getRepository('doctrine:User')->update($user, $data);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return new ErrorResponse('Failed to update a user');
         }
         return new Response('', 200);
@@ -226,6 +229,70 @@ class User extends Resource
             return new ErrorResponse($e->getMessage());
         }
         return new Response('', 200);
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/user/{id}/book",
+     *     summary="Retrieve all books of specified user",
+     *     produces={
+     *          "application/json"
+     *     },
+     *   @SWG\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="ID of the requested user. Use id = me to access current user",
+     *     required=true,
+     *     type="integer",
+     *     format="int64",
+     *     minimum=1.0
+     *   ),
+     *     @SWG\Parameter(
+     *         name="max_record_number",
+     *         in="query",
+     *         description="limitation param",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="books set",
+     *         @SWG\Schema(
+     *           type="array",
+     *           @SWG\Items(ref="#/definitions/Book")
+     *         )
+     *     ),
+     *   @SWG\Response(response=400, description="Invalid ID supplied"),
+     *   @SWG\Response(response=404, description="User not found"),
+     * )
+     * @SWG\Get(
+     *     path="/user/book",
+     *     @SWG\Response(response=301, description="Permanent redirect to current user`s space /user/me/book")
+     * )
+     * @param Application $app
+     * @param mixed $id
+     * @return ErrorResponse|RedirectResponse|Response
+     */
+    public function getBooks(Application $app, $id = null)
+    {
+        try {
+            if (is_null($id)) {
+                return new RedirectResponse(sprintf('/user/%s/book', self::CURRENT_USER_ALIAS), 301);
+            }
+            if ($id === User::CURRENT_USER_ALIAS) {
+                $user = $app['security.token_storage']->getToken()->getUser();
+            } else {
+                $user = $app['orm.em']->find('doctrine:User', $id);
+            }
+            if (!$user instanceof Entities\User) {
+                throw new NotFoundHttpException('Requested user was not found');
+            }
+            return new Response($app['serializer']->serialize($user->getBooks(), RESPONSE_FORMAT), 200);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
 }
