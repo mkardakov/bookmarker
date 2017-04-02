@@ -90,14 +90,20 @@ class Book extends Resource
      *     ),
      * )
      * @param \Silex\Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listBooks(\Silex\Application $app, Request $req)
+    public function listBooks(\Silex\Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $books = $app['orm.em']->getRepository('doctrine:Book')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($books, RESPONSE_FORMAT), 200);
+        try {
+            $books = $app['orm.em']->getRepository('doctrine:Book')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($books, RESPONSE_FORMAT), 200);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -342,12 +348,23 @@ class Book extends Resource
      */
     public function listBookCovers(\Silex\Application $app, $id)
     {
-        $book = $app['orm.em']->find('doctrine:Book', $id);
-        if (!$book instanceof Entities\Book) {
-            return new ErrorResponse('', 404);
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                return new ErrorResponse('', 404);
+            }
+            $queryParamsCriteria = $app['orm.em']->getRepository('doctrine:Book')->buildLimitedCriteria(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            $bookCovers = $book->getBookCovers()->matching($queryParamsCriteria);
+            return new Response($app['serializer']->serialize($bookCovers, RESPONSE_FORMAT), 200);
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
         }
-        $bookCovers = $book->getBookCovers();
-        return new Response($app['serializer']->serialize($bookCovers, RESPONSE_FORMAT), 200);
     }
 
     /**
@@ -908,7 +925,6 @@ class Book extends Resource
      *     ),
      *     @SWG\Response(response=404, description="Book not found"),
      * )
-     * @todo limitation of comments
      * @param \Silex\Application $app
      * @param $id
      * @return ErrorResponse|Response
@@ -920,13 +936,18 @@ class Book extends Resource
             if (!$book instanceof Entities\Book) {
                 throw new NotFoundHttpException('Requested resource not found');
             }
-            $comments = $book->getComments();
+            $queryParamsCriteria = $app['orm.em']->getRepository('doctrine:Comments')->buildLimitedCriteria(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            $comments = $book->getComments()->matching($queryParamsCriteria);
+            return new Response($app['serializer']->serialize($comments, RESPONSE_FORMAT), 200);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
         } catch (\Exception $e) {
             return new ErrorResponse($e->getMessage());
         }
-        return new Response($app['serializer']->serialize($comments, RESPONSE_FORMAT), 200);
     }
 
     /**

@@ -88,14 +88,20 @@ class User extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listUsers(Application $app, Request $req)
+    public function listUsers(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $users = $app['orm.em']->getRepository('doctrine:User')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($users, RESPONSE_FORMAT), 200);
+        try {
+            $users = $app['orm.em']->getRepository('doctrine:User')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($users, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -287,7 +293,15 @@ class User extends Resource
             if (!$user instanceof Entities\User) {
                 throw new NotFoundHttpException('Requested user was not found');
             }
-            return new Response($app['serializer']->serialize($user->getBooks(), RESPONSE_FORMAT), 200);
+            $queryParamsCriteria = $app['orm.em']->getRepository('doctrine:User')->buildLimitedCriteria(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize(
+                $user->getBooks()->matching($queryParamsCriteria),
+                RESPONSE_FORMAT
+            ), 200);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
         } catch (\Exception $e) {

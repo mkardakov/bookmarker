@@ -47,14 +47,20 @@ class Genre extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listGenres(Application $app, Request $req)
+    public function listGenres(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $genres = $app['orm.em']->getRepository('doctrine:Genre')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($genres, RESPONSE_FORMAT), 200);
+        try {
+            $genres = $app['orm.em']->getRepository('doctrine:Genre')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($genres, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**

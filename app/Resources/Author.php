@@ -82,14 +82,20 @@ class Author extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listAuthors(Application $app, Request $req)
+    public function listAuthors(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $authors = $app['orm.em']->getRepository('doctrine:Author')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($authors, RESPONSE_FORMAT), 200);
+        try {
+            $authors = $app['orm.em']->getRepository('doctrine:Author')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($authors, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
