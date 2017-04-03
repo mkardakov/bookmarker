@@ -9,7 +9,9 @@
 namespace Bookmarker\Resources;
 
 use Bookmarker\Registry;
+use Bookmarker\Responses\ErrorResponse;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -122,5 +124,26 @@ abstract class Resource
         return preg_replace_callback('/([^_])_([a-z])/', function (array $matches) {
             return $matches[1] . strtoupper($matches[2]);
         }, $snakeString);
+    }
+
+    /**
+     * @param \Silex\Application $app
+     * @param null $repo
+     * @param Criteria|null $criteria
+     * @return ErrorResponse
+     */
+    public function count(\Silex\Application $app, $repo = null, Criteria $criteria = null)
+    {
+        try {
+            if (empty($repo)) {
+                if (false === ($classNamePos = strrpos(get_called_class(), '\\'))) {
+                    throw new InvalidArgumentException('Seems controller does not have any valid namespace');
+                }
+                $repo = substr(get_called_class(), $classNamePos + 1);
+            }
+            return $app['orm.em']->getRepository("doctrine:$repo")->getTotalCount($criteria);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 }

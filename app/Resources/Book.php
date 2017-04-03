@@ -13,6 +13,7 @@ use Bookmarker\FileDrivers\LocalDriver;
 use Bookmarker\Jobs\Tasks\ConvertTask;
 use Bookmarker\Responses\CreatedResponse;
 use Bookmarker\Responses\ErrorResponse;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Bookmarker\Db\Entities;
@@ -74,9 +75,23 @@ class Book extends Resource
      *          "application/json"
      *     },
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -331,6 +346,27 @@ class Book extends Resource
      *        type="integer",
      *        format="int64",
      *        minimum=1.0
+     *     ),
+     *     @SWG\Parameter(
+     *         name="order",
+     *         in="query",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -915,6 +951,27 @@ class Book extends Resource
      *        format="int64",
      *        minimum=1.0
      *     ),
+     *     @SWG\Parameter(
+     *         name="order",
+     *         in="query",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="book comments",
@@ -1061,4 +1118,122 @@ class Book extends Resource
         return new Response('', 202);
     }
 
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/covers/count",
+     *     summary="Get count of book covers",
+     *     produces={
+     *          "application/json"
+     *     },
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     *     @SWG\Response(response=404, description="Book not found")
+     * )
+     * @param \Silex\Application $app
+     * @param $id
+     * @return ErrorResponse
+     */
+    public function countCovers(\Silex\Application $app, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            return parent::count($app, 'BookCovers', Criteria::create()->where(
+                Criteria::expr()->eq('book', $book)
+            ));
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/{id}/comments/count",
+     *     summary="Get count of book comments",
+     *     produces={
+     *          "application/json"
+     *     },
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     *     @SWG\Response(response=404, description="Book not found")
+     * )
+     * @param \Silex\Application $app
+     * @param $id
+     * @return ErrorResponse
+     */
+    public function countComments(\Silex\Application $app, $id)
+    {
+        try {
+            $book = $app['orm.em']->find('doctrine:Book', $id);
+            if (!$book instanceof Entities\Book) {
+                throw new NotFoundHttpException('Requested resource not found');
+            }
+            return parent::count($app, 'Comments', Criteria::create()->where(
+                Criteria::expr()->eq('book', $book)
+            ));
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/book/count",
+     *     summary="Get count of books",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     * )
+     */
 }

@@ -15,7 +15,7 @@ use Swagger\Annotations as SWG;
 /**
  * Class BookCovers
  * @package Bookmarker\Db\Entities
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Bookmarker\Db\Repositories\BookRepository")
  * @JMS\ExclusionPolicy("all")
  * @SWG\Definition(
  *   definition="BookCover",

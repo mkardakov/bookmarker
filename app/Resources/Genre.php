@@ -31,9 +31,23 @@ class Genre extends Resource
      *          "application/json"
      *     },
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -246,4 +260,25 @@ class Genre extends Resource
         }
         return new Response('', 200);
     }
+
+    /**
+     * @SWG\Get(
+     *     path="/genre/count",
+     *     summary="Get count of genres",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     * )
+     */
 }

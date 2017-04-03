@@ -102,4 +102,19 @@ abstract class Repository extends EntityRepository
         return Registry::get('app')['config'][APP_ENV]['max_record_number'];
     }
 
+    /**
+     * @param Criteria|null $criteria
+     * @return int
+     */
+    public function getTotalCount(Criteria $criteria = null)
+    {
+        $total = $this->createQueryBuilder('x')
+            ->select('COUNT(x)');
+        if (null !== $criteria) {
+            $total->addCriteria($criteria);
+        }
+        return $total->getQuery()
+            ->getSingleScalarResult();
+    }
+
 }
