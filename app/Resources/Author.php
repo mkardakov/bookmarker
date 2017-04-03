@@ -66,9 +66,23 @@ class Author extends Resource
      *          "application/json"
      *     },
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -82,14 +96,20 @@ class Author extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listAuthors(Application $app, Request $req)
+    public function listAuthors(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $authors = $app['orm.em']->getRepository('doctrine:Author')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($authors, RESPONSE_FORMAT), 200);
+        try {
+            $authors = $app['orm.em']->getRepository('doctrine:Author')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($authors, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -243,4 +263,24 @@ class Author extends Resource
         return new Response('', 200);
     }
 
+    /**
+     * @SWG\Get(
+     *     path="/author/count",
+     *     summary="Get count of authors",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     * )
+     */
 }

@@ -31,9 +31,23 @@ class Genre extends Resource
      *          "application/json"
      *     },
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -47,14 +61,20 @@ class Genre extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listGenres(Application $app, Request $req)
+    public function listGenres(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $genres = $app['orm.em']->getRepository('doctrine:Genre')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($genres, RESPONSE_FORMAT), 200);
+        try {
+            $genres = $app['orm.em']->getRepository('doctrine:Genre')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($genres, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -240,4 +260,25 @@ class Genre extends Resource
         }
         return new Response('', 200);
     }
+
+    /**
+     * @SWG\Get(
+     *     path="/genre/count",
+     *     summary="Get count of genres",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     * )
+     */
 }

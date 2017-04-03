@@ -7,7 +7,11 @@
  */
 
 namespace Bookmarker\Resources;
+
 use Bookmarker\Registry;
+use Bookmarker\Responses\ErrorResponse;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,21 +21,32 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class Resource
 {
 
+    const SUBPARAMS_SEPARATOR = ',';
+
+    const OPTIONS_SEPARATOR = '/';
+
     /**
-     * @param Request $req
-     * @return int
+     * @throws \Exception
+     * @return array
      */
-    protected function getMaxRowsNumber(Request $req)
+    protected function getOrdering()
     {
-        $app = Registry::get('app');
-        $maxCount = $actual = $app['config'][APP_ENV]['max_record_number'];
-        if ($req->query->has('record_number')) {
-            $actual = (int)$req->get('record_number');
-            if ($actual > $maxCount || $actual <= 0) {
-                $actual = $maxCount;
+        $result = [];
+        $req = Registry::get('request');
+        if ($req->query->has('order')) {
+            $rawOrder = $req->query->get('order');
+            $chunks = static::parseComplexQueryParam($rawOrder);
+            if (empty($chunks)) {
+                throw new \Exception('Query is malformed');
+            }
+            foreach ($chunks as $chunk) {
+                $dbField = static::convertSnakeToCamelCase($chunk[0]);
+                if (!empty($dbField)) {
+                    $result[$dbField] = isset($chunk[1]) ? $chunk[1] : Criteria::ASC;
+                }
             }
         }
-        return $actual;
+        return $result;
     }
 
     /**
@@ -60,5 +75,75 @@ abstract class Resource
             throw new \InvalidArgumentException('Received data is incorrect');
         }
         return $data;
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getPage()
+    {
+        $req = Registry::get('request');
+        return $req->query->has('page') ? (int)$req->query->get('page') : null;
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getLimit()
+    {
+        $req = Registry::get('request');
+        return $req->query->has('limit') ? (int)$req->query->get('limit') : null;
+    }
+
+    /**
+     * Parse Query params like: param=level1/level2,param2=l1/l2/l3,x=3
+     * @param string $query
+     * @return array
+     */
+    final public static function parseComplexQueryParam($query)
+    {
+        $options = [];
+        if (false !== ($subParams = explode(Resource::SUBPARAMS_SEPARATOR, $query))) {
+            foreach ($subParams as $param) {
+                $data = explode(Resource::OPTIONS_SEPARATOR, $param);
+                if (!empty($data)) {
+                    $options[] = $data;
+                }
+            }
+        }
+        return $options;
+    }
+
+    /**
+     * Convert snake case string aa_bb_cc to CamelCase aaBbCc
+     * @param $snakeString
+     * @return string
+     */
+    final private static function convertSnakeToCamelCase($snakeString)
+    {
+        return preg_replace_callback('/([^_])_([a-z])/', function (array $matches) {
+            return $matches[1] . strtoupper($matches[2]);
+        }, $snakeString);
+    }
+
+    /**
+     * @param \Silex\Application $app
+     * @param null $repo
+     * @param Criteria|null $criteria
+     * @return ErrorResponse
+     */
+    public function count(\Silex\Application $app, $repo = null, Criteria $criteria = null)
+    {
+        try {
+            if (empty($repo)) {
+                if (false === ($classNamePos = strrpos(get_called_class(), '\\'))) {
+                    throw new InvalidArgumentException('Seems controller does not have any valid namespace');
+                }
+                $repo = substr(get_called_class(), $classNamePos + 1);
+            }
+            return $app['orm.em']->getRepository("doctrine:$repo")->getTotalCount($criteria);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 }

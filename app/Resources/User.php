@@ -10,6 +10,7 @@ namespace Bookmarker\Resources;
 
 use Bookmarker\Responses\CreatedResponse;
 use Bookmarker\Responses\ErrorResponse;
+use Doctrine\Common\Collections\Criteria;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,9 +73,23 @@ class User extends Resource
      *          "application/json"
      *     },
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -88,14 +103,20 @@ class User extends Resource
      *     ),
      * )
      * @param Application $app
-     * @param Request $req
      * @return Response
      */
-    public function listUsers(Application $app, Request $req)
+    public function listUsers(Application $app)
     {
-        $actual = $this->getMaxRowsNumber($req);
-        $users = $app['orm.em']->getRepository('doctrine:User')->findBy(array(), array(), $actual);
-        return new Response($app['serializer']->serialize($users, RESPONSE_FORMAT), 200);
+        try {
+            $users = $app['orm.em']->getRepository('doctrine:User')->findLimited(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize($users, RESPONSE_FORMAT), 200);
+        } catch(\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -248,9 +269,23 @@ class User extends Resource
      *     minimum=1.0
      *   ),
      *     @SWG\Parameter(
-     *         name="max_record_number",
+     *         name="order",
      *         in="query",
-     *         description="limitation param",
+     *         description="sort book Objects, Example: ?order=id/DESC,name/ASC",
+     *         required=false,
+     *         type="string",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
+     *         required=false,
+     *         type="integer",
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Limit number of returned data. Positive value > 0",
      *         required=false,
      *         type="integer",
      *     ),
@@ -287,7 +322,15 @@ class User extends Resource
             if (!$user instanceof Entities\User) {
                 throw new NotFoundHttpException('Requested user was not found');
             }
-            return new Response($app['serializer']->serialize($user->getBooks(), RESPONSE_FORMAT), 200);
+            $queryParamsCriteria = $app['orm.em']->getRepository('doctrine:User')->buildLimitedCriteria(
+                $this->getPage(),
+                $this->getLimit(),
+                $this->getOrdering()
+            );
+            return new Response($app['serializer']->serialize(
+                $user->getBooks()->matching($queryParamsCriteria),
+                RESPONSE_FORMAT
+            ), 200);
         } catch (NotFoundHttpException $ne) {
             return new ErrorResponse($ne->getMessage(), 404);
         } catch (\Exception $e) {
@@ -295,4 +338,77 @@ class User extends Resource
         }
     }
 
+    /**
+     * @SWG\Get(
+     *     path="/user/{id}/book/count",
+     *     summary="Get count of book comments",
+     *     produces={
+     *          "application/json"
+     *     },
+     *      @SWG\Parameter(
+     *         description="ID of book to fetch",
+     *         format="int64",
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         type="integer"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     *     @SWG\Response(response=404, description="User not found")
+     * )
+     * @param Application $app
+     * @param $id
+     * @return ErrorResponse
+     */
+    public function countBooks(\Silex\Application $app, $id)
+    {
+        try {
+            if ($id === User::CURRENT_USER_ALIAS) {
+                $user = $app['security.token_storage']->getToken()->getUser();
+            } else {
+                $user = $app['orm.em']->find('doctrine:User', $id);
+            }
+            if (!$user instanceof Entities\User) {
+                throw new NotFoundHttpException('Requested user was not found');
+            }
+            return parent::count($app, 'Book', Criteria::create()->where(
+                Criteria::expr()->eq('user', $user)
+            ));
+        } catch (NotFoundHttpException $ne) {
+            return new ErrorResponse($ne->getMessage(), 404);
+        } catch (\Exception $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @SWG\Get(
+     *     path="/user/count",
+     *     summary="Get count of users",
+     *     produces={
+     *          "application/json"
+     *     },
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Returns total number of rows",
+     *         @SWG\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response=400,
+     *         description="Internal error occurs",
+     *     ),
+     * )
+     */
 }

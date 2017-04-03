@@ -10,6 +10,7 @@ production:
 local:
   debug: true
   max_record_number: 50
+  default_record_number: 20
   database:
       driver: pdo_mysql
       host: 172.17.0.1
