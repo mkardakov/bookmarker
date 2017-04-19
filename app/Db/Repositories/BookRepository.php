@@ -6,6 +6,7 @@ use Bookmarker\MetadataProcessor\MetadataFactory;
 use Bookmarker\FileDrivers\LocalDriver;
 use Bookmarker\Db\Entities;
 use Bookmarker\Registry;
+use Bookmarker\Search\SearchQueryBuilder;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -87,22 +88,22 @@ class BookRepository extends Repository
     public function deleteBook(Entities\Book $bookEntity)
     {
         try {
-            $delCallback = function($fileName) {
+            $delCallback = function ($fileName) {
                 try {
                     $fileDriver = new LocalDriver($fileName, true);
                     $fileDriver->delete();
                     return true;
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     return false;
                 }
             };
             foreach ($bookEntity->getFiles() as $file) {
                 $delCallback($file->getFilePath());
             }
-            $bookEntity->getBookCovers()->forAll(function($index, Entities\BookCovers $cover) use ($delCallback) {
+            $bookEntity->getBookCovers()->forAll(function ($index, Entities\BookCovers $cover) use ($delCallback) {
                 return $delCallback($cover->getImagePath());
             });
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         } finally {
             $em = $this->getEntityManager();
@@ -225,6 +226,60 @@ class BookRepository extends Repository
             $em->persist($bookCover);
             $em->flush();
         }
+    }
+
+    /**
+     * Accept search query array + sort/limit params
+     * Returns set of found books
+     * @param array $params
+     * @param int $page
+     * @param int $limit
+     * @param array $order
+     * @return array
+     * @throws \Exception
+     */
+    public function search(array $params, $page = 1, $limit = 0, $order = [])
+    {
+        $searchBuilder = new SearchQueryBuilder($params);
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.genre', 'g')
+            ->leftJoin('b.authors', 'a');
+        // Build array of search expressions based on input Query data
+        $where = $searchBuilder->setQueryBuilder($qb)
+            ->build();
+        if (!$where) {
+            throw new \Exception('Bad search criteria');
+        }
+        // get pagination criteria
+        $paginationCriteria = $this->buildLimitedCriteria($page, $limit, $order);
+        return $qb
+            ->where($where)
+            ->addCriteria($paginationCriteria)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @param array $params
+     * @return int|mixed
+     */
+    public function searchCount(array $params)
+    {
+        $searchBuilder = new SearchQueryBuilder($params);
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.genre', 'g')
+            ->leftJoin('b.authors', 'a')
+            ->select('COUNT(b)');
+        // Build array of search expressions based on input Query data
+        $where = $searchBuilder->setQueryBuilder($qb)
+            ->build();
+        if (!$where) {
+            return 0;
+        }
+        return $qb
+            ->where($where)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
 }

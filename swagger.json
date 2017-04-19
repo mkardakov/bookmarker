@@ -1302,6 +1302,105 @@
                 }
             }
         },
+        "/search": {
+            "get": {
+                "summary": "Search books using query string",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Search by book by title. Pattern: %title%",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "author_id",
+                        "in": "query",
+                        "description": "Search by known author ID",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "author_surname",
+                        "in": "query",
+                        "description": "Search by Author`s surname. Pattern: surname%",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "genre_id",
+                        "in": "query",
+                        "description": "Search by known genre ID",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Search by book language",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "books set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Shit happens"
+                    }
+                }
+            }
+        },
+        "/search/count": {
+            "get": {
+                "summary": "Get count of found books. See search query params",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    }
+                }
+            }
+        },
         "/user/{id}": {
             "get": {
                 "summary": "Retrieve a user by id",

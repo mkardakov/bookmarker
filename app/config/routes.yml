@@ -299,3 +299,17 @@ user_get_books_redirect:
   path: /user/book
   methods: ['GET', 'HEAD']
   defaults: {_controller: 'Bookmarker\Resources\User::getBooks'}
+
+search:
+  path: /search
+  methods: ['GET']
+  defaults: {_controller: 'Bookmarker\Resources\Search::search'}
+  requirements:
+    _format: json
+
+search_count:
+  path: /search/count
+  methods: ['GET']
+  defaults: {_controller: 'Bookmarker\Resources\Search::count'}
+  requirements:
+    _format: json
