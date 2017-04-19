@@ -5,6 +5,13 @@ book_list:
   requirements:
     _format: json
 
+book_list_count:
+  path: /book/count
+  defaults: { _controller: 'Bookmarker\Resources\Book::count' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
 book_get:
   path: /book/{id}
   defaults: { _controller: 'Bookmarker\Resources\Book::get' }
@@ -48,6 +55,13 @@ book_convert_to:
 book_covers_list:
   path: /book/{id}/covers
   defaults: { _controller: 'Bookmarker\Resources\Book::listBookCovers' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+book_covers_list_count:
+  path: /book/{id}/covers/count
+  defaults: { _controller: 'Bookmarker\Resources\Book::countCovers' }
   methods: ['GET']
   requirements:
     _format: json
@@ -110,6 +124,13 @@ book_comments_list:
   requirements:
     _format: json
 
+book_comments_list_count:
+  path: /book/{id}/comments/count
+  defaults: { _controller: 'Bookmarker\Resources\Book::countComments' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
 book_comment_get:
   path: /book/{id}/comments/{comment_id}
   defaults: { _controller: 'Bookmarker\Resources\Book::getComment' }
@@ -142,6 +163,13 @@ book_comment_post:
 genre_list:
   path: /genre
   defaults: { _controller: 'Bookmarker\Resources\Genre::listGenres' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
+genre_list_count:
+  path: /genre/count
+  defaults: { _controller: 'Bookmarker\Resources\Genre::count' }
   methods: ['GET']
   requirements:
     _format: json
@@ -180,6 +208,13 @@ author_list:
   requirements:
     _format: json
 
+author_list_count:
+  path: /author/count
+  defaults: { _controller: 'Bookmarker\Resources\Author::count' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
 author_get:
   path: /author/{id}
   defaults: { _controller: 'Bookmarker\Resources\Author::get' }
@@ -214,6 +249,13 @@ user_list:
   requirements:
     _format: json
 
+user_list_count:
+  path: /user/count
+  defaults: { _controller: 'Bookmarker\Resources\User::count' }
+  methods: ['GET']
+  requirements:
+    _format: json
+
 user_get:
   path: /user/{id}
   defaults: { _controller: 'Bookmarker\Resources\User::get' }
@@ -241,17 +283,33 @@ user_delete:
   requirements:
     id: '\d+'
 
-role_list:
-  path: /role
-  defaults: { _controller: 'Bookmarker\Resources\Role::listRoles' }
+user_get_books:
+  path: /user/{id}/book
+  defaults: { _controller: 'Bookmarker\Resources\User::getBooks' }
+  methods: ['GET', 'HEAD']
+
+user_get_books_count:
+  path: /user/{id}/book/count
+  defaults: { _controller: 'Bookmarker\Resources\User::countBooks' }
   methods: ['GET']
   requirements:
     _format: json
 
-role_get:
-  path: /role/{id}
-  defaults: { _controller: 'Bookmarker\Resources\Role::get' }
+user_get_books_redirect:
+  path: /user/book
+  methods: ['GET', 'HEAD']
+  defaults: {_controller: 'Bookmarker\Resources\User::getBooks'}
+
+search:
+  path: /search
   methods: ['GET']
+  defaults: {_controller: 'Bookmarker\Resources\Search::search'}
   requirements:
-    id: '\d+'
+    _format: json
+
+search_count:
+  path: /search/count
+  methods: ['GET']
+  defaults: {_controller: 'Bookmarker\Resources\Search::count'}
+  requirements:
     _format: json

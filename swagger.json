@@ -131,9 +131,23 @@
                 ],
                 "parameters": [
                     {
-                        "name": "max_record_number",
+                        "name": "order",
                         "in": "query",
-                        "description": "limitation param",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
                         "required": false,
                         "type": "integer"
                     }
@@ -186,6 +200,25 @@
                     },
                     "400": {
                         "description": "bad request"
+                    }
+                }
+            }
+        },
+        "/author/count": {
+            "get": {
+                "summary": "Get count of authors",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
                     }
                 }
             }
@@ -314,9 +347,23 @@
                 ],
                 "parameters": [
                     {
-                        "name": "max_record_number",
+                        "name": "order",
                         "in": "query",
-                        "description": "limitation param",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
                         "required": false,
                         "type": "integer"
                     }
@@ -411,6 +458,27 @@
                         "type": "integer",
                         "format": "int64",
                         "minimum": 1
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
                     }
                 ],
                 "responses": {
@@ -711,6 +779,27 @@
                         "type": "integer",
                         "format": "int64",
                         "minimum": 1
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
                     }
                 ],
                 "responses": {
@@ -939,6 +1028,89 @@
                 }
             }
         },
+        "/book/{id}/covers/count": {
+            "get": {
+                "summary": "Get count of book covers",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    }
+                }
+            }
+        },
+        "/book/{id}/comments/count": {
+            "get": {
+                "summary": "Get count of book comments",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    },
+                    "404": {
+                        "description": "Book not found"
+                    }
+                }
+            }
+        },
+        "/book/count": {
+            "get": {
+                "summary": "Get count of books",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    }
+                }
+            }
+        },
         "/genre": {
             "get": {
                 "summary": "Retrieve all genres",
@@ -947,9 +1119,23 @@
                 ],
                 "parameters": [
                     {
-                        "name": "max_record_number",
+                        "name": "order",
                         "in": "query",
-                        "description": "limitation param",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
                         "required": false,
                         "type": "integer"
                     }
@@ -1097,6 +1283,124 @@
                 }
             }
         },
+        "/genre/count": {
+            "get": {
+                "summary": "Get count of genres",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    }
+                }
+            }
+        },
+        "/search": {
+            "get": {
+                "summary": "Search books using query string",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Search by book by title. Pattern: %title%",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "author_id",
+                        "in": "query",
+                        "description": "Search by known author ID",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "author_surname",
+                        "in": "query",
+                        "description": "Search by Author`s surname. Pattern: surname%",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "genre_id",
+                        "in": "query",
+                        "description": "Search by known genre ID",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "lang",
+                        "in": "query",
+                        "description": "Search by book language",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "books set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Shit happens"
+                    }
+                }
+            }
+        },
+        "/search/count": {
+            "get": {
+                "summary": "Get count of found books. See search query params",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    }
+                }
+            }
+        },
         "/user/{id}": {
             "get": {
                 "summary": "Retrieve a user by id",
@@ -1195,9 +1499,23 @@
                 ],
                 "parameters": [
                     {
-                        "name": "max_record_number",
+                        "name": "order",
                         "in": "query",
-                        "description": "limitation param",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
                         "required": false,
                         "type": "integer"
                     }
@@ -1243,6 +1561,123 @@
                     },
                     "400": {
                         "description": "bad request"
+                    }
+                }
+            }
+        },
+        "/user/{id}/book": {
+            "get": {
+                "summary": "Retrieve all books of specified user",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the requested user. Use id = me to access current user",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "sort book Objects, Example: ?order=id/DESC,name/ASC",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit number of returned data. Positive value > 0",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "books set",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/user/book": {
+            "get": {
+                "responses": {
+                    "301": {
+                        "description": "Permanent redirect to current user`s space /user/me/book"
+                    }
+                }
+            }
+        },
+        "/user/{id}/book/count": {
+            "get": {
+                "summary": "Get count of book comments",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of book to fetch",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/user/count": {
+            "get": {
+                "summary": "Get count of users",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns total number of rows",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Internal error occurs"
                     }
                 }
             }

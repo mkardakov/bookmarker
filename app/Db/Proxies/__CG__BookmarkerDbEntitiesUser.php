@@ -367,6 +367,17 @@ class User extends \Bookmarker\Db\Entities\User implements \Doctrine\ORM\Proxy\P
     /**
      * {@inheritDoc}
      */
+    public function getBooks()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getBooks', []);
+
+        return parent::getBooks();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getSalt()
     {
 

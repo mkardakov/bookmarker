@@ -91,6 +91,7 @@ $app->before(function(\Symfony\Component\HttpFoundation\Request $request) use($a
         header('Allow: GET,POST,OPTIONS,DELETE,PUT,PATCH');
         exit();
     }
+    \Bookmarker\Registry::set('request', $request);
 }, Application::EARLY_EVENT);
 
 $loader = require ROOT . 'vendor/autoload.php';
